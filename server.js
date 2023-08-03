@@ -181,4 +181,4 @@ app.post('/delete-error', async (req, res) => {
 });
 
 // Démarrer le serveur
-app.listen(3000, () => logger.info('App is listening on port 3000')); // Log le démarrage du serveur
+app.listen(443, () => logger.info('App is listening on port 443')); // Log le démarrage du serveur
