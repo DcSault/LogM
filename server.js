@@ -68,6 +68,8 @@ passport.use(new GitHubStrategy({
     }
 }));
 
+app.get('/auth/github', passport.authenticate('github'));
+
 // Callback pour l'authentification GitHub
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
