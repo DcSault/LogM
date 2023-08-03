@@ -26,27 +26,6 @@ app.set('view engine', 'ejs'); // Définit ejs comme moteur de template
 app.use(express.static(__dirname));  // Sert les fichiers statiques
 app.use(express.static('public'));  // Sert les fichiers statiques dans le dossier 'public'
 
-// Liste des utilisateurs autorisés
-const allowedUsers = ['render', 'rosiq', 'user3'];
-
-// Middleware pour vérifier le nom d'utilisateur
-// Middleware pour vérifier le nom d'utilisateur
-app.use((req, res, next) => {
-    const userInfo = os.userInfo();
-
-    if (!allowedUsers.includes(userInfo.username)) {
-        logger.warn(`Unsuccessful login attempt by user: ${userInfo.username}`); // Log l'échec de connexion
-        console.warn(`Unsuccessful login attempt by user: ${userInfo.username}`); // Affiche l'échec de connexion dans la console
-        return res.status(403).send('Accès refusé');
-    }
-
-    logger.info(`Successful login by user: ${userInfo.username}`); // Log la connexion réussie
-    console.info(`Successful login by user: ${userInfo.username}`); // Affiche la connexion réussie dans la console
-
-    next();
-});
-
-
 // Récupère le token GitHub de l'environnement
 const token = process.env.GITHUB_TOKEN;
 
@@ -62,7 +41,7 @@ let errors = [];
 const perPage = 3;  
 
 // Initialise l'id de la prochaine erreur
-let nextErrorId = 1;   
+let nextErrorId = 1;  
 
 // Route GET pour la page d'accueil
 app.get('/', async (req, res) => {
