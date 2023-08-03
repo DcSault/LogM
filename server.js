@@ -54,9 +54,9 @@ passport.deserializeUser((user, done) => done(null, user));
 
 // Stratégie GitHub
 passport.use(new GitHubStrategy({
-    clientID: GITHUB_CLIENT_ID,
-    clientSecret: GITHUB_CLIENT_SECRET,
-    callbackURL: CALLBACK_URL,
+    clientID: "9fe69b4fa93a4b0597a4",
+    clientSecret: "1d2e822a0bd705cd4223b9e32a22e0b43888e4db",
+    callbackURL: "https://logm.onrender.com/auth/github/callback",
 }, async (accessToken, refreshToken, profile, done) => {
     // Vérifier si l'utilisateur est autorisé
     if (allowedUsers.includes(profile.username)) {
