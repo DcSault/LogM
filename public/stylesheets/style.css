@@ -1,0 +1,73 @@
+/* Style pour l'élément 'body' */
+body {
+    font-family: Arial, sans-serif;  /* Définit la police du texte */
+    padding: 0 10%;  /* Ajoute une marge intérieure horizontale de 10% */
+    background-color: #f9f9f9;  /* Définit la couleur d'arrière-plan */
+}
+
+/* Style pour les titres de niveau 1 */
+h1 {
+    color: #333;  /* Définit la couleur du texte */
+    text-align: center;  /* Centre le texte */
+    margin-bottom: 30px;  /* Ajoute une marge en bas de 30px */
+}
+
+/* Style pour les formulaires */
+form {
+    background-color: #fff;  /* Définit la couleur d'arrière-plan */
+    padding: 20px;  /* Ajoute une marge intérieure de 20px */
+    margin-bottom: 20px;  /* Ajoute une marge en bas de 20px */
+    border-radius: 5px;  /* Arrondit les coins */
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);  /* Ajoute une ombre */
+}
+
+/* Style pour les inputs de type texte */
+input[type="text"] {
+    width: 100%;  /* Définit la largeur à 100% de la largeur du conteneur parent */
+    padding: 10px;  /* Ajoute une marge intérieure de 10px */
+    margin-bottom: 10px;  /* Ajoute une marge en bas de 10px */
+    border: 1px solid #ddd;  /* Ajoute une bordure */
+    border-radius: 5px;  /* Arrondit les coins */
+}
+
+/* Style pour les boutons */
+button {
+    padding: 10px 20px;  /* Ajoute une marge intérieure de 10px en haut et en bas, et de 20px à gauche et à droite */
+    background-color: #007bff;  /* Définit la couleur d'arrière-plan */
+    color: #fff;  /* Définit la couleur du texte */
+    border: none;  /* Supprime la bordure */
+    border-radius: 5px;  /* Arrondit les coins */
+    cursor: pointer;  /* Change le curseur au survol */
+    margin-right: 10px;  /* Ajoute une marge à droite de 10px */
+}
+
+/* Style pour les boutons au survol */
+button:hover {
+    background-color: #0056b3;  /* Change la couleur d'arrière-plan au survol */
+}
+
+/* Style pour les div */
+div {
+    background-color: #fff;  /* Définit la couleur d'arrière-plan */
+    padding: 20px;  /* Ajoute une marge intérieure de 20px */
+    margin-bottom: 10px;  /* Ajoute une marge en bas de 10px */
+    border-radius: 5px;  /* Arrondit les coins */
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);  /* Ajoute une ombre */
+}
+
+/* Style pour le conteneur de boutons */
+.button-container {
+    display: flex;  /* Définit le type de disposition à 'flex' */
+    justify-content: start;  /* Aligne les éléments à gauche */
+    gap: 10px;  /* Ajoute un espace de 10px entre les boutons */
+}
+
+/* Style pour les titres de niveau 2 */
+h2 {
+    color: #007bff;  /* Définit la couleur du texte */
+}
+
+/* Style pour les paragraphes */
+p {
+    color: #555;  /* Définit la couleur du texte */
+}

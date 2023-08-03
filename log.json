@@ -1,0 +1,15 @@
+{"level":"info","message":"GitHub Token: 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","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"info","message":"User: V.ROSIQUE, Adding error: {\"id\":2,\"code\":\"Erreur non gérée: The handle(2) does not exist or already free.\",\"description\":\"Erreur de DXS\",\"solution\":\"Vérifiez le chemin du fichier et assurez-vous qu'il existe\",\"tda\":\"002\"}","service":"user-service"}
+{"level":"info","message":"GitHub Token: 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","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"info","message":"User: V.ROSIQUE, Adding error: {\"id\":3,\"code\":\"ERR003\",\"description\":\"Erreur de dépassement de mémoire\",\"solution\":\"Essayez de fermer certaines applications pour libérer de la mémoire\",\"tda\":\"TDA1\"}","service":"user-service"}
+{"level":"info","message":"User: V.ROSIQUE, Adding error: {\"id\":4,\"code\":\"Vive le support N3\",\"description\":\"Le support N2 c'est moins bien\",\"solution\":\"Abdessamad passe au support N3 !\",\"tda\":\"TDA Abdessamad passe au support N3 !\"}","service":"user-service"}
+{"level":"info","message":"User: V.ROSIQUE, Editing error: {\"id\":3,\"code\":\"ERR003\",\"description\":\"Erreur de dépassement de mémoire\",\"solution\":\"Essayez de fermer certaines applications pour libérer de la mémoire\",\"tda\":\"TDA12\"}","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"info","message":"User: rosiq, Editing error: {\"id\":4,\"code\":\"Vive le support N3\",\"description\":\"Le support N2 c'est moins bien\",\"solution\":\"Abdessamad passe au support N3 !\",\"tda\":\"TDA Abdessamad passe au support N3 ! §\"}","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"info","message":"App is listening on port 3000","service":"user-service"}
+{"level":"warn","message":"Unsuccessful login attempt by user: rosiq","service":"user-service"}
+{"level":"warn","message":"Unsuccessful login attempt by user: rosiq","service":"user-service"}

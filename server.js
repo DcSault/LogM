@@ -1,0 +1,184 @@
+// Importe les dépendances nécessaires
+require('dotenv').config({ path: './token.env' }); // Charge les variables d'environnement du fichier '.env'
+const express = require('express'); // Framework web pour Node.js
+const axios = require('axios'); // Client HTTP basé sur les promesses
+const bodyParser = require('body-parser'); // Middleware pour analyser le corps des requêtes entrantes
+const ejs = require('ejs'); // Moteur de template pour générer du HTML
+const os = require('os'); // Module de Node.js pour interagir avec le système d'exploitation
+const winston = require('winston'); // Bibliothèque de logging
+
+// Crée une instance de winston pour le logging
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        new winston.transports.File({ filename: 'log.json' }), // Log vers un fichier
+        new winston.transports.Console() // Log vers la console
+    ],
+});
+
+// Crée une instance d'express
+const app = express();
+app.use(bodyParser.json()); // Pour analyser les corps de requêtes en JSON
+app.use(bodyParser.urlencoded({ extended: true })); // Pour analyser les corps de requêtes en URL encodé
+app.set('view engine', 'ejs'); // Définit ejs comme moteur de template
+app.use(express.static(__dirname));  // Sert les fichiers statiques
+app.use(express.static('public'));  // Sert les fichiers statiques dans le dossier 'public'
+
+// Liste des utilisateurs autorisés
+const allowedUsers = ['user1', 'user2', 'user3'];
+
+// Middleware pour vérifier le nom d'utilisateur
+// Middleware pour vérifier le nom d'utilisateur
+app.use((req, res, next) => {
+    const userInfo = os.userInfo();
+
+    if (!allowedUsers.includes(userInfo.username)) {
+        logger.warn(`Unsuccessful login attempt by user: ${userInfo.username}`); // Log l'échec de connexion
+        console.warn(`Unsuccessful login attempt by user: ${userInfo.username}`); // Affiche l'échec de connexion dans la console
+        return res.status(403).send('Accès refusé');
+    }
+
+    logger.info(`Successful login by user: ${userInfo.username}`); // Log la connexion réussie
+    console.info(`Successful login by user: ${userInfo.username}`); // Affiche la connexion réussie dans la console
+
+    next();
+});
+
+
+// Récupère le token GitHub de l'environnement
+const token = process.env.GITHUB_TOKEN;
+
+// Crée les en-têtes pour les requêtes axios vers GitHub
+const headers = { Authorization: `token ${token}` };
+const owner = 'DcSault';
+const repo = 'script_powershell';
+const path = 'LogM/erreur.json';
+const fileURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+let errors = [];
+
+// Nombre d'erreurs par page pour la pagination
+const perPage = 3;  
+
+// Initialise l'id de la prochaine erreur
+let nextErrorId = 1;   
+
+// Route GET pour la page d'accueil
+app.get('/', async (req, res) => {
+    const page = req.query.page ? Number(req.query.page) : 1;
+
+    // Récupère les erreurs depuis GitHub
+    try {
+        const { data: { content } } = await axios.get(fileURL, { headers });
+        errors = JSON.parse(Buffer.from(content, 'base64').toString());
+        
+        // Met à jour nextErrorId pour qu'il soit un de plus que le plus grand id actuel
+        if (errors.length > 0) {
+            nextErrorId = Math.max(...errors.map(error => Number(error.id))) + 1;
+        }
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Pagination des erreurs
+    const offset = (page - 1) * perPage;
+    const pagedErrors = errors.slice(offset, offset + perPage);
+    const totalPages = Math.ceil(errors.length / perPage);
+
+    // Rend le template avec les erreurs paginées et les informations de pagination
+    res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
+});
+
+// Route POST pour ajouter une erreur
+app.post('/add-error', async (req, res) => {
+    const error = {
+        id: nextErrorId++,  // Incrémente l'id
+        code: req.body.code,
+        description: req.body.description,
+        solution: req.body.solution,
+        tda: req.body.tda,
+    };
+
+    errors.push(error); // Ajoute l'erreur à la liste
+
+    // Log l'ajout de l'erreur
+    logger.info(`User: ${os.userInfo().username}, Adding error: ${JSON.stringify(error)}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Ajouter une nouvelle erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
+// Route POST pour modifier une erreur
+app.post('/edit-error', async (req, res) => {
+    const { code, description, solution, tda } = req.body;
+    const id = Number(req.body.id);
+    const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, met à jour l'erreur
+    if (index !== -1) {
+        errors[index] = { id, code, description, solution, tda };
+    }
+
+    // Log la modification de l'erreur
+    logger.info(`User: ${os.userInfo().username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Modifier une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
+// Route POST pour supprimer une erreur
+app.post('/delete-error', async (req, res) => {
+    const { id } = req.body;
+    const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, supprime l'erreur de la liste
+    if (index !== -1) {
+        errors.splice(index, 1);
+    }
+
+    // Log la suppression de l'erreur
+    logger.info(`User: ${os.userInfo().username}, Deleting error: ${JSON.stringify(req.body)}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Supprimer une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
+// Démarrer le serveur
+app.listen(3000, () => logger.info('App is listening on port 3000')); // Log le démarrage du serveur

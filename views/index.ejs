@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Définition du titre de la page -->
+    <title>Erreurs</title>
+    <!-- Lien vers la feuille de style CSS -->
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+</head>
+<body>
+<!-- Titre principal de la page -->
+<h1>LogM - Erreurs</h1>
+
+<!-- Formulaire pour ajouter une nouvelle erreur -->
+<form action="/add-error" method="post">
+    <h2>Ajouter une Erreur</h2>
+    <!-- Les inputs cachés permettent de transmettre des données sans afficher un champ de saisie à l'utilisateur -->
+    <input type="hidden" name="id" value="<%= nextErrorId %>">
+    <!-- Les champs de saisie pour les détails de l'erreur -->
+    <input type="text" name="code" placeholder="Code" required>
+    <input type="text" name="description" placeholder="Description" required>
+    <input type="text" name="solution" placeholder="Solution" required>
+    <input type="text" name="tda" placeholder="TDA" required>
+    <!-- Bouton pour soumettre le formulaire -->
+    <button type="submit">Ajouter</button>
+</form>
+
+<!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
+<% for(let i=0; i<errors.length; i++) { %>
+    <div>
+        <!-- Affichage des détails de chaque erreur -->
+        <h2><%= errors[i].code %></h2>
+        <p><%= errors[i].description %></p>
+        <p><%= errors[i].solution %></p>
+        <p><%= errors[i].tda %></p>
+        <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
+        <div class="button-container">
+            <!-- Formulaire pour modifier une erreur existante -->
+            <form id="edit-form-<%= errors[i].id %>" style="display: none;" action="/edit-error" method="post">
+                <!-- Les inputs cachés et les champs de saisie pour les détails de l'erreur -->
+                <input type="hidden" name="id" value="<%= errors[i].id %>">
+                <input type="text" name="code" placeholder="Code" value="<%= errors[i].code %>" required>
+                <input type="text" name="description" placeholder="Description" value="<%= errors[i].description %>" required>
+                <input type="text" name="solution" placeholder="Solution" value="<%= errors[i].solution %>" required>
+                <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
+                <!-- Bouton pour soumettre le formulaire -->
+                <button type="submit">Valider les modifications</button>
+            </form>
+            <!-- Bouton pour afficher le formulaire de modification -->
+            <button type="button" onclick="document.getElementById('edit-form-<%= errors[i].id %>').style.display = 'block'">Modifier</button>
+            <!-- Conteneur pour le bouton de suppression de chaque erreur -->
+            <div>
+                <!-- Formulaire pour supprimer une erreur existante -->
+                <form action="/delete-error" method="post">
+                    <!-- Input caché pour transmettre l'ID de l'erreur à supprimer -->
+                    <input type="hidden" name="id" value="<%= errors[i].id %>">
+                    <!-- Bouton pour soumettre le formulaire -->
+                    <button type="submit">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- Pagination pour naviguer entre les pages de la liste des erreurs -->
+<div class="pagination">
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <!-- Lien vers chaque page de la liste des erreurs -->
+        <a href="/?page=<%= i %>"><%= i %></a>
+    <% } %>
+</div>
+
+</body>
+</html>
