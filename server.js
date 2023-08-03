@@ -27,7 +27,7 @@ app.use(express.static(__dirname));  // Sert les fichiers statiques
 app.use(express.static('public'));  // Sert les fichiers statiques dans le dossier 'public'
 
 // Liste des utilisateurs autorisés
-const allowedUsers = ['user1', 'user2', 'user3'];
+const allowedUsers = ['render', 'rosiq', 'user3'];
 
 // Middleware pour vérifier le nom d'utilisateur
 // Middleware pour vérifier le nom d'utilisateur
