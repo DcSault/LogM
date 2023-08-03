@@ -16,7 +16,7 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL; 
 
 // List d'utilisateur autoriser 
-const allowedUsers = ['username1', 'username2']; 
+const allowedUsers = ['DcSault', 'username2']; 
 
 // Crée une instance de winston pour le logging
 const logger = winston.createLogger({
