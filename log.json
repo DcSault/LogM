@@ -13,3 +13,8 @@
 {"level":"info","message":"App is listening on port 3000","service":"user-service"}
 {"level":"warn","message":"Unsuccessful login attempt by user: rosiq","service":"user-service"}
 {"level":"warn","message":"Unsuccessful login attempt by user: rosiq","service":"user-service"}
+{"level":"info","message":"App is listening on port 443","service":"user-service"}
+{"level":"info","message":"App is listening on port 443","service":"user-service"}
+{"level":"info","message":"App is listening on port 443","service":"user-service"}
+{"level":"info","message":"App is listening on port 443","service":"user-service"}
+{"level":"info","message":"App is listening on port 443","service":"user-service"}

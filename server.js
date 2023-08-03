@@ -6,6 +6,17 @@ const bodyParser = require('body-parser'); // Middleware pour analyser le corps 
 const ejs = require('ejs'); // Moteur de template pour générer du HTML
 const os = require('os'); // Module de Node.js pour interagir avec le système d'exploitation
 const winston = require('winston'); // Bibliothèque de logging
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
+
+// Les variables d'environnement
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const CALLBACK_URL = process.env.CALLBACK_URL; 
+
+// List d'utilisateur autoriser 
+const allowedUsers = ['username1', 'username2']; 
 
 // Crée une instance de winston pour le logging
 const logger = winston.createLogger({
@@ -26,6 +37,47 @@ app.set('view engine', 'ejs'); // Définit ejs comme moteur de template
 app.use(express.static(__dirname));  // Sert les fichiers statiques
 app.use(express.static('public'));  // Sert les fichiers statiques dans le dossier 'public'
 
+// Configurer la session express
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false,
+}));
+
+// Configurer Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Sérialisation et désérialisation des utilisateurs pour la session
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+
+// Stratégie GitHub
+passport.use(new GitHubStrategy({
+    clientID: "9fe69b4fa93a4b0597a4",
+    clientSecret: "1d2e822a0bd705cd4223b9e32a22e0b43888e4db",
+    callbackURL: "https://logm.onrender.com",
+}, async (accessToken, refreshToken, profile, done) => {
+    // Vérifier si l'utilisateur est autorisé
+    if (allowedUsers.includes(profile.username)) {
+        done(null, profile);
+    } else {
+        done(new Error('User not authorized'));
+    }
+}));
+
+// Authentification via GitHub
+app.get('/auth/github', passport.authenticate('github'));
+
+// Callback pour l'authentification GitHub
+app.get('/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/login' }),
+    (req, res) => {
+        // Authentification réussie, rediriger vers la page d'accueil
+        res.redirect('/');
+    }
+);
+
 // Récupère le token GitHub de l'environnement
 const token = process.env.GITHUB_TOKEN;
 
@@ -45,6 +97,11 @@ let nextErrorId = 1;
 
 // Route GET pour la page d'accueil
 app.get('/', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     const page = req.query.page ? Number(req.query.page) : 1;
 
     // Récupère les erreurs depuis GitHub
@@ -71,6 +128,11 @@ app.get('/', async (req, res) => {
 
 // Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     const error = {
         id: nextErrorId++,  // Incrémente l'id
         code: req.body.code,
@@ -102,6 +164,11 @@ app.post('/add-error', async (req, res) => {
 
 // Route POST pour modifier une erreur
 app.post('/edit-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     const { code, description, solution, tda } = req.body;
     const id = Number(req.body.id);
     const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
@@ -132,6 +199,11 @@ app.post('/edit-error', async (req, res) => {
 
 // Route POST pour supprimer une erreur
 app.post('/delete-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     const { id } = req.body;
     const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
 
