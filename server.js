@@ -145,6 +145,8 @@ app.get('/', async (req, res) => {
     res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
 
+const categories = ['MICEN4', 'Inot']; 
+
 // Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
@@ -178,8 +180,8 @@ app.post('/add-error', async (req, res) => {
         logger.error(error); // Log l'erreur si une se produit
     }
 
-    // Redirige vers la page d'accueil
-    res.redirect('/');
+    // Redirige vers la page d'accueil avec les erreurs et les catégories
+    res.render('index', { errors, categories });
 });
 
 // Route POST pour modifier une erreur
