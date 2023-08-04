@@ -4,7 +4,7 @@ const express = require('express'); // Framework web pour Node.js
 const axios = require('axios'); // Client HTTP basé sur les promesses
 const bodyParser = require('body-parser'); // Middleware pour analyser le corps des requêtes entrantes
 const ejs = require('ejs'); // Moteur de template pour générer du HTML
-//const os = require('os'); // Module de Node.js pour interagir avec le système d'exploitation
+// const os = require('os'); // Module de Node.js pour interagir avec le système d'exploitation
 const winston = require('winston'); // Bibliothèque de logging
 const session = require('express-session');
 const passport = require('passport');
@@ -16,7 +16,7 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL; 
 
 // List d'utilisateur autoriser 
-const allowedUsers = ['DcSault', 'Kraken974','User3']; 
+const allowedUsers = ['DcSault', 'Kraken974', 'User3']; 
 
 // Crée une instance de winston pour le logging
 const logger = winston.createLogger({
