@@ -189,13 +189,13 @@ app.post('/edit-error', async (req, res) => {
         return res.redirect('/auth/github');
     }
 
-    const { code, description, solution, tda } = req.body;
+    const { code, description, solution, tda, category } = req.body;  // Ajoutez 'category' ici
     const id = Number(req.body.id);
     const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
 
     // Si l'erreur est trouvée, met à jour l'erreur
     if (index !== -1) {
-    const { code, description, solution, tda, category } = req.body;
+        errors[index] = { ...errors[index], code, description, solution, tda, category };  // Ajoutez 'category' ici
     }
 
     // Log la modification de l'erreur
@@ -250,6 +250,8 @@ app.post('/delete-error', async (req, res) => {
     // Redirige vers la page d'accueil
     res.redirect('/');
 });
+
+
 
 // Démarrer le serveur
 app.listen(443, () => logger.info('App is listening on port 443')); // Log le démarrage du serveur
