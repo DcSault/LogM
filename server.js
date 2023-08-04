@@ -108,7 +108,11 @@ app.get('/', async (req, res) => {
     // Récupère les erreurs depuis GitHub
     try {
         const { data: { content } } = await axios.get(fileURL, { headers });
-        errors = JSON.parse(Buffer.from(content, 'base64').toString());
+        const tempErrors = JSON.parse(Buffer.from(content, 'base64').toString());
+
+        // Efface les erreurs précédentes pour éviter une fuite de mémoire
+        errors.length = 0;
+        Array.prototype.push.apply(errors, tempErrors);
         
         // Met à jour nextErrorId pour qu'il soit un de plus que le plus grand id actuel
         if (errors.length > 0) {
@@ -123,23 +127,22 @@ app.get('/', async (req, res) => {
     const pagedErrors = errors.slice(offset, offset + perPage);
     const totalPages = Math.ceil(errors.length / perPage);
 
-    // Rend le template avec les erreurs paginées et les informations de pagination
-    res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
-});
-
-app.get('/form', function(req, res) {
     var categories = ['Micen4', 'Inot']; // Ce pourrait être récupéré d'une base de données
-    var selectedCategory = errors[i].category; // Cela peut être récupéré de n'importe où dans votre code
 
-    var options = categories.map(function(category) {
-        return {
-            value: category,
-            text: category,
-            selected: category === selectedCategory
-        };
+    pagedErrors.forEach(error => {
+        const selectedCategory = error.category; // Cela peut être récupéré de n'importe où dans votre code
+
+        error.options = categories.map(function(category) {
+            return {
+                value: category,
+                text: category,
+                selected: category === selectedCategory
+            };
+        });
     });
 
-    res.render('form', { options: options });
+    // Rend le template avec les erreurs paginées et les informations de pagination
+    res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
 
 // Route POST pour ajouter une erreur
