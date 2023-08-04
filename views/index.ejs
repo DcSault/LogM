@@ -36,22 +36,27 @@
         <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
         <div class="button-container">
             <!-- Formulaire pour modifier une erreur existante -->
+            <form action="/submit_url" method="post">
+                <label for="category">Category:</label><br>
+                <% errors.forEach(function(error) { %>
+                    <select id="category" name="category" required>
+                        <option value="">Choisit la Catégorie</option>
+                        <% error.options.forEach(function(option) { %>
+                            <option value="<%= option.value %>" <%= option.selected ? 'selected' : '' %>><%= option.text %></option>
+                        <% }) %>
+                    </select><br>
+                <% }) %>
+                <input type="submit" value="Submit">
+            </form>            
             <form id="edit-form-<%= errors[i].id %>" style="display: none;" action="/edit-error" method="post">
                 <!-- Les inputs cachés et les champs de saisie pour les détails de l'erreur -->
+
                 <input type="hidden" name="id" value="<%= errors[i].id %>">
                 <input type="text" name="code" placeholder="Code" value="<%= errors[i].code %>" required>
                 <input type="text" name="description" placeholder="Description" value="<%= errors[i].description %>" required>
                 <input type="text" name="solution" placeholder="Solution" value="<%= errors[i].solution %>" required>
                 <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
-                    <label for="category">Category:</label><br>
-                    <select id="category" name="category" required>
-                        <option value="">Choisit la Catégorie</option>
-                        <% options.forEach(function(option) { %>
-                            <option value="<%= option.value %>" <%= option.selected ? 'selected' : '' %>><%= option.text %></option>
-                        <% }) %>
-                    </select><br>
-                    <input type="submit" value="Submit">
-                
+
                 <!-- Bouton pour soumettre le formulaire -->
                 <button type="submit">Valider les modifications</button>
             </form>
