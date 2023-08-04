@@ -36,7 +36,7 @@
         <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
         <div class="button-container">
             <!-- Formulaire pour modifier une erreur existante -->
-            <form action="/edit-error" method="post">
+            <form id="edit-form-<%= error.id %>" style="display: none;" action="/edit-error" method="post">
                 <label for="category">Category:</label><br>
                 <% errors.forEach(function(error) { %>
                     <select id="category" name="category" required>
