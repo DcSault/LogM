@@ -96,12 +96,15 @@ const perPage = 3;
 // Initialise l'id de la prochaine erreur
 let nextErrorId = 1;  
 
+const categories = ['MICEN4', 'Inot']; 
+
 // Route GET pour la page d'accueil
 app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
     if (!req.user) {
-        return res.redirect('/auth/github');
+        return res.render('index', { errors, categories }); // Rend la vue index avec les erreurs et les catégories
     }
+    
 
     const page = req.query.page ? Number(req.query.page) : 1;
 
@@ -144,8 +147,6 @@ app.get('/', async (req, res) => {
     // Rend le template avec les erreurs paginées et les informations de pagination
     res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
-
-const categories = ['MICEN4', 'Inot']; 
 
 // Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
