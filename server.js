@@ -140,6 +140,7 @@ app.post('/add-error', async (req, res) => {
         description: req.body.description,
         solution: req.body.solution,
         tda: req.body.tda,
+        category: req.body.category,
     };
 
     errors.push(error); // Ajoute l'erreur à la liste
@@ -170,13 +171,13 @@ app.post('/edit-error', async (req, res) => {
         return res.redirect('/auth/github');
     }
 
-    const { code, description, solution, tda } = req.body;
+    const { code, description, solution, tda, category } = req.body; // Accepte la catégorie à partir du corps de la requête
     const id = Number(req.body.id);
     const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
 
     // Si l'erreur est trouvée, met à jour l'erreur
     if (index !== -1) {
-        errors[index] = { id, code, description, solution, tda };
+        errors[index] = { id, code, description, solution, tda, category }; // Inclut la catégorie lors de la mise à jour de l'erreur
     }
 
     // Log la modification de l'erreur
@@ -196,7 +197,7 @@ app.post('/edit-error', async (req, res) => {
 
     // Redirige vers la page d'accueil
     res.redirect('/');
-});
+})
 
 // Route POST pour supprimer une erreur
 app.post('/delete-error', async (req, res) => {
