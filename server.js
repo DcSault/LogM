@@ -145,7 +145,7 @@ app.post('/add-error', async (req, res) => {
     errors.push(error); // Ajoute l'erreur à la liste
 
     // Log l'ajout de l'erreur
-    logger.info(`User: ${os.userInfo().username}, Adding error: ${JSON.stringify(error)}`);
+    logger.info(`User: ${profile.username}, Adding error: ${JSON.stringify(error)}`);
 
     // Met à jour les erreurs sur GitHub
     try {
@@ -180,7 +180,7 @@ app.post('/edit-error', async (req, res) => {
     }
 
     // Log la modification de l'erreur
-    logger.info(`User: ${os.userInfo().username}, Editing error: ${JSON.stringify(errors[index])}`);
+    logger.info(`User: ${profile.username}, Editing error: ${JSON.stringify(errors[index])}`);
 
     // Met à jour les erreurs sur GitHub
     try {
@@ -214,7 +214,7 @@ app.post('/delete-error', async (req, res) => {
     }
 
     // Log la suppression de l'erreur
-    logger.info(`User: ${os.userInfo().username}, Deleting error: ${JSON.stringify(req.body)}`);
+    logger.info(`User: ${profile.username}, Deleting error: ${JSON.stringify(req.body)}`);
 
     // Met à jour les erreurs sur GitHub
     try {
