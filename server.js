@@ -178,24 +178,27 @@ app.post('/edit-error', async (req, res) => {
     // Si l'erreur est trouvée, met à jour l'erreur
     if (index !== -1) {
         errors[index] = { id, code, description, solution, tda, category }; // Inclut la catégorie lors de la mise à jour de l'erreur
+
+        // Log la modification de l'erreur
+        logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+        // Met à jour les erreurs sur GitHub
+        try {
+            const { data: { sha } } = await axios.get(fileURL, { headers });
+            await axios.put(fileURL, {
+                message: 'Modifier une erreur',
+                content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+                sha,
+            }, { headers });
+        } catch (error) {
+            logger.error(error); // Log l'erreur si une se produit
+        }
+
+        // Rend la vue avec l'erreur actuelle
+        return res.render('viewname', { currentError: errors[index] });
     }
 
-    // Log la modification de l'erreur
-    logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
-
-    // Met à jour les erreurs sur GitHub
-    try {
-        const { data: { sha } } = await axios.get(fileURL, { headers });
-        await axios.put(fileURL, {
-            message: 'Modifier une erreur',
-            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-            sha,
-        }, { headers });
-    } catch (error) {
-        logger.error(error); // Log l'erreur si une se produit
-    }
-
-    // Redirige vers la page d'accueil
+    // Redirige vers la page d'accueil si l'erreur n'est pas trouvée
     res.redirect('/');
 });
 

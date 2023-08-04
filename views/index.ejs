@@ -50,9 +50,9 @@
                 <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
                 <select name="category" required>
                     <option value="" disabled selected>Veuillez choisir une option</option>
-                    <option value="micen" <% if (errors[i].category === 'micen') { %>selected<% } %>>Micen</option>
-                    <option value="inot" <% if (errors[i].category === 'inot') { %>selected<% } %>>Inot</option>
-                </select>
+                    <option value="micen" <% if (currentError.category === 'micen') { %>selected<% } %>>Micen</option>
+                    <option value="inot" <% if (currentError.category === 'inot') { %>selected<% } %>>Inot</option>
+                </select>                
                 <!-- Bouton pour soumettre le formulaire -->
                 <button type="submit">Valider les modifications</button>
             </form>
