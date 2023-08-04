@@ -197,7 +197,7 @@ app.post('/edit-error', async (req, res) => {
 
     // Redirige vers la page d'accueil
     res.redirect('/');
-})
+});
 
 // Route POST pour supprimer une erreur
 app.post('/delete-error', async (req, res) => {
