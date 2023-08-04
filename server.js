@@ -13,10 +13,10 @@ const GitHubStrategy = require('passport-github').Strategy;
 // Les variables d'environnement
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const CALLBACK_URL = process.env.CALLBACK_URL;
+const CALLBACK_URL = process.env.CALLBACK_URL; 
 
 // List d'utilisateur autoriser 
-const allowedUsers = ['DcSault', 'username2'];
+const allowedUsers = ['DcSault', 'username2']; 
 
 // Crée une instance de winston pour le logging
 const logger = winston.createLogger({
@@ -134,32 +134,103 @@ app.post('/add-error', async (req, res) => {
         return res.redirect('/auth/github');
     }
 
-    // Crée une nouvelle erreur avec l'id et les détails de l'erreur
-    const newError = { id: nextErrorId++, ...req.body };
+    const error = {
+        id: nextErrorId++,  // Incrémente l'id
+        code: req.body.code,
+        description: req.body.description,
+        solution: req.body.solution,
+        tda: req.body.tda,
+    };
 
-    // Ajoute la nouvelle erreur à la liste des erreurs
-    errors.push(newError);
+    errors.push(error); // Ajoute l'erreur à la liste
 
-    // Envoie les erreurs mises à jour à GitHub
+    // Log l'ajout de l'erreur
+    logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
+
+    // Met à jour les erreurs sur GitHub
     try {
-    await axios.put(fileURL, {
-        message: `Suppression de l'erreur avec l'id: ${req.body.id}`,
-        content: Buffer.from(JSON.stringify(errors)).toString('base64'),
-        sha: (await axios.get(fileURL, { headers })).data.sha
-    }, { headers });
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Ajouter une nouvelle erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
 
-    // Log le succès
-    logger.info(`User: ${req.user.username}, Deleted an error with id: ${req.body.id}`);
-} catch (error) {
-    // Log l'erreur si une se produit
-    logger.error(error);
-}
-
-// Redirige vers la page d'accueil
+    // Redirige vers la page d'accueil
     res.redirect('/');
 });
 
-// Démarre le serveur sur le port spécifié
-const port = process.env.PORT || 443;
-app.listen(port, () => logger.info(`Server running on http://localhost:${port}`));
+// Route POST pour modifier une erreur
+app.post('/edit-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
 
+    const { code, description, solution, tda } = req.body;
+    const id = Number(req.body.id);
+    const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, met à jour l'erreur
+    if (index !== -1) {
+        errors[index] = { id, code, description, solution, tda };
+    }
+
+    // Log la modification de l'erreur
+    logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Modifier une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
+// Route POST pour supprimer une erreur
+app.post('/delete-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
+    const { id } = req.body;
+    const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, supprime l'erreur de la liste
+    if (index !== -1) {
+        errors.splice(index, 1);
+    }
+
+    // Log la suppression de l'erreur
+    logger.info(`User: ${req.user.username}, Deleting error: ${JSON.stringify(req.body)}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Supprimer une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
+// Démarrer le serveur
+app.listen(443, () => logger.info('App is listening on port 443')); // Log le démarrage du serveur
