@@ -127,6 +127,21 @@ app.get('/', async (req, res) => {
     res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
 
+app.get('/form', function(req, res) {
+    var categories = ['Micen4', 'Inot']; // Ce pourrait être récupéré d'une base de données
+    var selectedCategory = errors[i].category; // Cela peut être récupéré de n'importe où dans votre code
+
+    var options = categories.map(function(category) {
+        return {
+            value: category,
+            text: category,
+            selected: category === selectedCategory
+        };
+    });
+
+    res.render('form', { options: options });
+});
+
 // Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub

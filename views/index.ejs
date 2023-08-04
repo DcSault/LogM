@@ -43,7 +43,17 @@
                 <input type="text" name="description" placeholder="Description" value="<%= errors[i].description %>" required>
                 <input type="text" name="solution" placeholder="Solution" value="<%= errors[i].solution %>" required>
                 <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
-                <input type="text" name="category" placeholder="TDA" value="<%= errors[i].category %>" required>
+                <form action="/submit_url" method="post">
+                    <label for="category">Category:</label><br>
+                    <select id="category" name="category" required>
+                        <option value="">Choisit la Catégorie</option>
+                        <% options.forEach(function(option) { %>
+                            <option value="<%= option.value %>" <%= option.selected ? 'selected' : '' %>><%= option.text %></option>
+                        <% }) %>
+                    </select><br>
+                    <input type="submit" value="Submit">
+                </form>
+                
                 <!-- Bouton pour soumettre le formulaire -->
                 <button type="submit">Valider les modifications</button>
             </form>
