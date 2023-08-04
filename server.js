@@ -102,7 +102,7 @@ const categories = ['MICEN4', 'Inot'];
 app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
     if (!req.user) {
-        return res.render('index', { errors, categories, nextErrorId }); // Passez nextErrorId à la vue
+        return res.redirect('/auth/github');
     }
 
     const page = req.query.page ? Number(req.query.page) : 1;

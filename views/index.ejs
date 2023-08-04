@@ -11,7 +11,7 @@
 <h1>LogM - Erreurs</h1>
 
 <!-- Formulaire pour ajouter une nouvelle erreur -->
-<<form action="/add-error" method="post">
+<form action="/add-error" method="post">
     <h2>Ajouter une Erreur</h2>
     <!-- Les inputs cachés permettent de transmettre des données sans afficher un champ de saisie à l'utilisateur -->
     <input type="hidden" name="id" value="<%= nextErrorId %>">
@@ -20,18 +20,10 @@
     <input type="text" name="description" placeholder="Description" required>
     <input type="text" name="solution" placeholder="Solution" required>
     <input type="text" name="tda" placeholder="TDA" required>
-    
-    <!-- Liste déroulante pour le choix de la catégorie -->
-    <select name="category" required>
-        <% categories.forEach(function(category) { %>
-            <option value="<%= category %>"><%= category %></option>
-        <% }); %>
-    </select>
-    
+    <input type="text" name="Catégorie" placeholder="category" required>
     <!-- Bouton pour soumettre le formulaire -->
     <button type="submit">Ajouter</button>
 </form>
-
 
 <!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
 <% for(let i=0; i<errors.length; i++) { %>
@@ -52,6 +44,7 @@
                 <input type="text" name="description" placeholder="Description" value="<%= errors[i].description %>" required>
                 <input type="text" name="solution" placeholder="Solution" value="<%= errors[i].solution %>" required>
                 <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
+                <input type="text" name="Catégorie" placeholder="category" value="<%= errors[i].category %>" required>
                 <!-- Bouton pour soumettre le formulaire -->
                 <button type="submit">Valider les modifications</button>
             </form>
