@@ -32,6 +32,7 @@
         <p><%= errors[i].description %></p>
         <p><%= errors[i].solution %></p>
         <p><%= errors[i].tda %></p>
+        <p><%= errors[i].category %></p>
         <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
         <div class="button-container">
             <!-- Formulaire pour modifier une erreur existante -->
@@ -42,6 +43,7 @@
                 <input type="text" name="description" placeholder="Description" value="<%= errors[i].description %>" required>
                 <input type="text" name="solution" placeholder="Solution" value="<%= errors[i].solution %>" required>
                 <input type="text" name="tda" placeholder="TDA" value="<%= errors[i].tda %>" required>
+                <input type="text" name="category" placeholder="TDA" value="<%= errors[i].category %>" required>
                 <!-- Bouton pour soumettre le formulaire -->
                 <button type="submit">Valider les modifications</button>
             </form>
