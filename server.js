@@ -254,6 +254,14 @@ app.post('/edit-error', async (req, res) => {
     res.render('errors', { errors: filteredErrors });
 });
 
+app.get('/filter', async (req, res) => {
+    const category = req.query.category;
+    const filteredErrors = errors.filter(error => error.category === category);
+
+    // Supposons que vous avez une vue 'errors.ejs' pour afficher les erreurs
+    res.render('errors', { errors: filteredErrors });
+});
+
  
  // Démarrer le serveur
  app.listen(443, () => logger.info('App is listening on port 443')); // Log le démarrage du serveur
