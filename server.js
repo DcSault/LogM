@@ -278,9 +278,15 @@ app.get('/filter', async (req, res) => {
     });
 });
 
-app.get('/path-to-unfiltered-view', (req, res) => {
-    res.render('index', { errors: errors });  
+app.get('/all-categories', (req, res) => {
+    Category.find({}, (err, categories) => { // Pas de filtres appliqués
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(categories);
+    });
 });
+
 
 
  

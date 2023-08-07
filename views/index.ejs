@@ -7,6 +7,11 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
 </head>
 <body>
+    <script>
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
 <!-- Titre principal de la page -->
 <h1>LogM - Erreurs</h1>
 
@@ -41,7 +46,7 @@
         <option value="Inot">Inot</option>
         <option value="Micen4">Micen4</option>
     </select>
-    <a href="/path-to-unfiltered-view">Supprimer le filtre</a>
+    <button id="resetFilters">Supprimer les filtres</button>
 </form>
 
 
