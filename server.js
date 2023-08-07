@@ -1,28 +1,28 @@
- // Importe les dépendances nécessaires
- require('dotenv').config({ path: './token.env' }); // Charge les variables d'environnement du fichier '.env'
- const express = require('express'); // Framework web pour Node.js
- const axios = require('axios'); // Client HTTP basé sur les promesses
- const bodyParser = require('body-parser'); // Middleware pour analyser le corps des requêtes entrantes
- const ejs = require('ejs'); // Moteur de template pour générer du HTML
- const os = require('os'); // Module de Node.js pour interagir avec le système d'exploitation
- const winston = require('winston'); // Bibliothèque de logging
- const session = require('express-session');
- const passport = require('passport');
- const GitHubStrategy = require('passport-github').Strategy;
- 
- // Les variables d'environnement
- const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
- const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
- const CALLBACK_URL = process.env.CALLBACK_URL; 
- 
- require('dotenv').config({ path: './redis.env' });
+// Importe les dépendances nécessaires
+require('dotenv').config({ path: './token.env' });
+const express = require('express');
+const axios = require('axios');
+const bodyParser = require('body-parser');
+const ejs = require('ejs');
+const os = require('os');
+const winston = require('winston');
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
 
- const redis = require('redis');
- const client = redis.createClient({
-     host: process.env.REDIS_HOST,
-     port: process.env.REDIS_PORT,
-     password: process.env.REDIS_PASSWORD
- });
+// Les variables d'environnement
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const CALLBACK_URL = process.env.CALLBACK_URL;
+
+require('dotenv').config({ path: './redis.env' });
+const redis = require('redis');
+
+const client = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD
+});
 
 client.on('connect', function() {
     console.log('Connecté à Redis');
@@ -86,16 +86,18 @@ client.sismember('allowedUsers', 'DcSault', function(err, reply) {
      clientID: "9fe69b4fa93a4b0597a4",
      clientSecret: "1d2e822a0bd705cd4223b9e32a22e0b43888e4db",
      callbackURL: "https://logm.onrender.com/auth/github/callback",
- }, async (accessToken, refreshToken, profile, done) => {
-     // Vérifier si l'utilisateur est autorisé
-     if (allowedUsers.includes(profile.username)) {
-         logger.info(`User: ${profile.username}, Authenticated successfully via GitHub`);
-         done(null, profile);
-     } else {
-         logger.info(`User: ${profile.username}, Failed to authenticate via GitHub`);
-         done(new Error('User not authorized'));
-     }
- }));
+    }, async (accessToken, refreshToken, profile, done) => {
+        // Vérification si l'utilisateur est autorisé via Redis
+        client.sismember('allowedUsers', profile.username, function(err, reply) {
+            if (reply === 1) {
+                logger.info(`User: ${profile.username}, Authenticated successfully via GitHub`);
+                done(null, profile);
+            } else {
+                logger.info(`User: ${profile.username}, Failed to authenticate via GitHub`);
+                done(new Error('User not authorized'));
+            }
+        });
+    }));
  
  app.get('/auth/github', passport.authenticate('github'));
  
