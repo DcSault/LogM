@@ -257,15 +257,21 @@ app.post('/edit-error', async (req, res) => {
 app.get('/filter', async (req, res) => {
     const category = req.query.category;
     const filteredErrors = errors.filter(error => error.category === category);
-    
+
+    // Calcul de nextErrorId comme précédemment
     let maxId = Math.max(...errors.map(error => error.id));
     let nextErrorId = maxId + 1;
+    
+    // Définition de la pagination
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredErrors.length / itemsPerPage);
 
     res.render('index', { 
         errors: filteredErrors, 
-        nextErrorId: nextErrorId 
+        nextErrorId: nextErrorId,
+        totalPages: totalPages
     });
-});
+})
 
 
  
