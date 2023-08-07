@@ -279,7 +279,7 @@ app.get('/filter', async (req, res) => {
 });
 
 app.get('/path-to-unfiltered-view', (req, res) => {
-    res.render('index', { errors: allErrors });  
+    res.render('index', { errors: errors });  
 });
 
 
