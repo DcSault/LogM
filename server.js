@@ -321,6 +321,30 @@ app.get('/all-categories', (req, res) => {
     });
 });
 
+app.get('/search', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
+    const query = req.query.query;
+
+    // Si aucune chaîne de requête n'est fournie, redirigez vers la page d'accueil
+    if (!query) {
+        return res.redirect('/');
+    }
+
+    // Filtrez les erreurs basées sur la chaîne de requête (recherche insensible à la casse dans la description)
+    const searchedErrors = errors.filter(error => error.description.toLowerCase().includes(query.toLowerCase()));
+
+    // Rend le template avec les erreurs filtrées
+    res.render('index', { 
+        errors: searchedErrors, 
+        nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
+        totalPages: Math.ceil(searchedErrors.length / 10)  // 10 est supposé être le nombre d'items par page
+    });
+});
+
+
 
 
  

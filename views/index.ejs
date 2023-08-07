@@ -38,6 +38,12 @@
     <button type="submit">Ajouter</button>
 </form>
 
+<form action="/search" method="get">
+    <input type="text" name="query" placeholder="Recherche...">
+    <input type="submit" value="Rechercher">
+</form>
+
+
 <!-- Formulaire pour filtrer les erreurs par catégorie -->
 <h2>Filtrer par catégorie</h2>
 <form action="/filter" method="GET">
@@ -50,18 +56,27 @@
 </form>
 
 
-
 <!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
-<% for(let i=0; i<errors.length; i++) { %>
-    <div>
-        <!-- Affichage des détails de chaque erreur -->
-        <h2><%= errors[i].code %></h2>
-        <p><%= errors[i].description %></p>
-        <p><%= errors[i].solution %></p>
-        <p><%= errors[i].tda %></p>
-        <p>Catégorie: <%= errors[i].category %></p>
-        <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
-        <div class="button-container">
+<!-- Affichage des erreurs ou des résultats de la recherche -->
+<% if(errors && errors.length > 0) { %>
+    <% for(let i=0; i<errors.length; i++) { %>
+        <div>
+            <!-- Affichage des détails de chaque erreur -->
+            <h2><%= errors[i].code %></h2>
+            <p><%= errors[i].description %></p>
+            <p><%= errors[i].solution %></p>
+            <p><%= errors[i].tda %></p>
+            <p>Catégorie: <%= errors[i].category %></p>
+            
+            <!-- Conteneur pour les boutons de modification et de suppression de chaque erreur -->
+            <div class="button-container">
+                <!-- Vos boutons vont ici -->
+            </div>
+        </div>
+    <% } %>
+<% } else { %>
+    <p>Aucun résultat trouvé.</p>
+<% } %>
             <!-- Formulaire pour modifier une erreur existante -->
             <form id="edit-form-<%= errors[i].id %>" style="display: none;" action="/edit-error" method="post">
                 <!-- Les inputs cachés et les champs de saisie pour les détails de l'erreur -->
