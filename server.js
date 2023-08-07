@@ -278,16 +278,14 @@ app.get('/filter', async (req, res) => {
     });
 });
 
-app.get('/path-to-unfiltered-view', (req, res) => {
-    // Votre logique pour récupérer toutes les erreurs non filtrées
-
-    // Supposons que vous ayez une liste complète d'erreurs appelée 'allErrors'
-    const allErrors = [...];  // Récupérez ceci de votre source de données
-
-    res.render('path-to-your-ejs-template', { 
-        errors: allErrors,
-        // autres variables dont vous pourriez avoir besoin pour le rendu
-    });
+app.get('/path-to-unfiltered-view', async (req, res) => {
+    try {
+        const allErrors = await data.getAllErrors();
+        res.render('errorsView', { errors: allErrors });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des erreurs:", error);
+        res.status(500).send("Erreur interne du serveur");
+    }
 });
 
 
