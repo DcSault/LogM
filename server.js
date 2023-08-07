@@ -128,40 +128,42 @@
  });
  
  // Route POST pour ajouter une erreur
- app.post('/add-error', async (req, res) => {
-     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
-     if (!req.user) {
-         return res.redirect('/auth/github');
-     }
- 
-     const error = {
-         id: nextErrorId++,  // Incrémente l'id
-         code: req.body.code,
-         description: req.body.description,
-         solution: req.body.solution,
-         tda: req.body.tda,
-     };
- 
-     errors.push(error); // Ajoute l'erreur à la liste
- 
-     // Log l'ajout de l'erreur
-     logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
- 
-     // Met à jour les erreurs sur GitHub
-     try {
-         const { data: { sha } } = await axios.get(fileURL, { headers });
-         await axios.put(fileURL, {
-             message: 'Ajouter une nouvelle erreur',
-             content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-             sha,
-         }, { headers });
-     } catch (error) {
-         logger.error(error); // Log l'erreur si une se produit
-     }
- 
-     // Redirige vers la page d'accueil
-     res.redirect('/');
- });
+app.post('/add-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
+    // Créez un nouvel objet "error" avec le champ "category" ajouté
+    const error = {
+        id: nextErrorId++,  // Incrémente l'id
+        code: req.body.code,
+        description: req.body.description,
+        solution: req.body.solution,
+        tda: req.body.tda,
+        category: req.body.category  // Récupérez la catégorie du formulaire
+    };
+
+    errors.push(error); // Ajoute l'erreur à la liste
+
+    // Log l'ajout de l'erreur
+    logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Ajouter une nouvelle erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
  
  // Route POST pour modifier une erreur
  app.post('/edit-error', async (req, res) => {
@@ -231,6 +233,26 @@
      // Redirige vers la page d'accueil
      res.redirect('/');
  });
+ 
+ app.get('/filter/:category', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
+    const category = req.params.category;
+    const filteredErrors = errors.filter(error => error.category === category);
+
+    // Log pour le filtrage des erreurs
+    logger.info(`User: ${req.user.username}, Filtering errors by category: ${category}`);
+
+    // Essayez de mettre à jour ou d'obtenir des données si nécessaire (similaire à votre route add, mais cela dépend de votre cas d'utilisation)
+
+    // Redirige vers une vue pour afficher les erreurs filtrées
+    // Assumons que vous avez une vue 'errors.ejs' pour afficher les erreurs
+    res.render('errors', { errors: filteredErrors });
+});
+
  
  // Démarrer le serveur
  app.listen(443, () => logger.info('App is listening on port 443')); // Log le démarrage du serveur
