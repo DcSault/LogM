@@ -43,9 +43,7 @@
     </select>
 </form>
 
-<% if (typeof category !== 'undefined' && category) { %>
-    <a href="/filter" class="btn">Supprimer le filtre</a>
-<% } %>
+<a href="/path-to-unfiltered-view">Supprimer le filtre</a>
 
 <!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
 <% for(let i=0; i<errors.length; i++) { %>

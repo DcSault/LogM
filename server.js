@@ -255,20 +255,25 @@ app.post('/edit-error', async (req, res) => {
 });
 
 app.get('/filter', async (req, res) => {
+    // Assumons que vous avez un tableau d'erreurs nommé 'errors'
     const category = req.query.category;
-    let filteredErrors;
 
-    if (category) {
-        filteredErrors = errors.filter(error => error.category === category);
-    } else {
-        filteredErrors = errors; // Affiche toutes les erreurs si aucune catégorie n'est spécifiée
+    // Si aucun paramètre de catégorie n'est fourni, renvoyer toutes les erreurs
+    if (!category) {
+        res.render('index', { 
+            errors: errors, 
+            nextErrorId: errors.length + 1,
+            totalPages: Math.ceil(errors.length / 10)  // 10 est supposé être le nombre d'items par page
+        });
+        return;
     }
 
-    // Calcul de nextErrorId et totalPages comme précédemment
+    const filteredErrors = errors.filter(error => error.category === category);
+    const totalPages = Math.ceil(filteredErrors.length / 10);  // 10 est supposé être le nombre d'items par page
 
     res.render('index', { 
         errors: filteredErrors, 
-        nextErrorId: nextErrorId,
+        nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
         totalPages: totalPages
     });
 });
