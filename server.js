@@ -256,22 +256,23 @@ app.post('/edit-error', async (req, res) => {
 
 app.get('/filter', async (req, res) => {
     const category = req.query.category;
-    const filteredErrors = errors.filter(error => error.category === category);
+    let filteredErrors;
 
-    // Calcul de nextErrorId comme précédemment
-    let maxId = Math.max(...errors.map(error => error.id));
-    let nextErrorId = maxId + 1;
-    
-    // Définition de la pagination
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(filteredErrors.length / itemsPerPage);
+    if (category) {
+        filteredErrors = errors.filter(error => error.category === category);
+    } else {
+        filteredErrors = errors; // Affiche toutes les erreurs si aucune catégorie n'est spécifiée
+    }
+
+    // Calcul de nextErrorId et totalPages comme précédemment
 
     res.render('index', { 
         errors: filteredErrors, 
         nextErrorId: nextErrorId,
         totalPages: totalPages
     });
-})
+});
+
 
 
  
