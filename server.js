@@ -17,13 +17,12 @@
  
  require('dotenv').config({ path: './redis.env' });
 
-const redis = require('redis');
-
-const client = redis.createClient({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    password: process.env.REDIS_PASSWORD
-});
+ const redis = require('redis');
+ const client = redis.createClient({
+     host: process.env.REDIS_HOST,
+     port: process.env.REDIS_PORT,
+     password: process.env.REDIS_PASSWORD
+ });
 
 client.on('connect', function() {
     console.log('Connecté à Redis');
@@ -34,7 +33,10 @@ client.on('error', function(err) {
 });
 
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers', 'DcSault', 'username2');
+client.sadd('allowedUsers', 'DcSault', 'username2', (err, reply) => {
+    if (err) throw err;
+    console.log(reply); // nombre d'éléments ajoutés
+});
 
 // Vérification si un utilisateur est autorisé
 client.sismember('allowedUsers', 'DcSault', function(err, reply) {
