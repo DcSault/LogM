@@ -5,6 +5,7 @@ npm install body-parser
 npm install ejs
 npm install winston
 npm install redis
+npm install ioredis
 
 | nomenclature du projet node | 
 
