@@ -33,7 +33,7 @@ client.on('error', function(err) {
 });
 
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers', 'DcSault', 'username2').then(reply => {
+client.sadd('allowedUsers', 'username1', 'username2').then(reply => {
     console.log(reply); // nombre d'éléments ajoutés
 }).catch(err => {
     console.error('Erreur lors de l\'ajout:', err);
