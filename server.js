@@ -278,6 +278,17 @@ app.get('/filter', async (req, res) => {
     });
 });
 
+app.get('/path-to-unfiltered-view', (req, res) => {
+    // Votre logique pour récupérer toutes les erreurs non filtrées
+
+    // Supposons que vous ayez une liste complète d'erreurs appelée 'allErrors'
+    const allErrors = [...];  // Récupérez ceci de votre source de données
+
+    res.render('path-to-your-ejs-template', { 
+        errors: allErrors,
+        // autres variables dont vous pourriez avoir besoin pour le rendu
+    });
+});
 
 
  
