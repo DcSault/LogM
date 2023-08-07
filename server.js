@@ -260,7 +260,7 @@ app.get('/filter', async (req, res) => {
         return res.redirect('/'); 
     }
     const filteredErrors = errors.filter(error => error.category === category);
-    res.render('errors', { errors: filteredErrors });
+    res.render('index', { errors: filteredErrors });
 });
 
  
