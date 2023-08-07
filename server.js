@@ -166,39 +166,40 @@ app.post('/add-error', async (req, res) => {
 });
  
  // Route POST pour modifier une erreur
- app.post('/edit-error', async (req, res) => {
-     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
-     if (!req.user) {
-         return res.redirect('/auth/github');
-     }
- 
-     const { code, description, solution, tda } = req.body;
-     const id = Number(req.body.id);
-     const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
- 
-     // Si l'erreur est trouvée, met à jour l'erreur
-     if (index !== -1) {
-         errors[index] = { id, code, description, solution, tda };
-     }
- 
-     // Log la modification de l'erreur
-     logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
- 
-     // Met à jour les erreurs sur GitHub
-     try {
-         const { data: { sha } } = await axios.get(fileURL, { headers });
-         await axios.put(fileURL, {
-             message: 'Modifier une erreur',
-             content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-             sha,
-         }, { headers });
-     } catch (error) {
-         logger.error(error); // Log l'erreur si une se produit
-     }
- 
-     // Redirige vers la page d'accueil
-     res.redirect('/');
- });
+app.post('/edit-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
+    const { code, description, solution, tda, category } = req.body;
+    const id = Number(req.body.id);
+    const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, met à jour l'erreur
+    if (index !== -1) {
+        errors[index] = { id, code, description, solution, tda, category };
+    }
+
+    // Log la modification de l'erreur
+    logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Modifier une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+});
+
  
  // Route POST pour supprimer une erreur
  app.post('/delete-error', async (req, res) => {
