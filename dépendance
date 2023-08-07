@@ -4,6 +4,7 @@ npm install axios
 npm install body-parser
 npm install ejs
 npm install winston
+npm install redis
 
 | nomenclature du projet node | 
 
