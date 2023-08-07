@@ -278,14 +278,8 @@ app.get('/filter', async (req, res) => {
     });
 });
 
-app.get('/path-to-unfiltered-view', async (req, res) => {
-    try {
-        const allErrors = await data.getAllErrors();
-        res.render('errorsView', { errors: allErrors });
-    } catch (error) {
-        console.error("Erreur lors de la récupération des erreurs:", error);
-        res.status(500).send("Erreur interne du serveur");
-    }
+app.get('/path-to-unfiltered-view', (req, res) => {
+    res.render('index', { errors: allErrors });  
 });
 
 
