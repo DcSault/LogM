@@ -256,9 +256,10 @@ app.post('/edit-error', async (req, res) => {
 
 app.get('/filter', async (req, res) => {
     const category = req.query.category;
+    if (!category) {
+        return res.redirect('/'); 
+    }
     const filteredErrors = errors.filter(error => error.category === category);
-
-    // Supposons que vous avez une vue 'errors.ejs' pour afficher les erreurs
     res.render('errors', { errors: filteredErrors });
 });
 

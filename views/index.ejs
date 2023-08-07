@@ -35,14 +35,12 @@
 
 <!-- Formulaire pour filtrer les erreurs par catégorie -->
 <h2>Filtrer par catégorie</h2>
-<form action="/filter" method="get">
-    <select name="category">
+<form action="/filter" method="GET">
+    <select name="category" onchange="this.form.submit()">
         <option value="" disabled selected>Choisir une catégorie</option>
         <option value="Inot">Inot</option>
         <option value="Micen4">Micen4</option>
-        <!-- ajoutez d'autres catégories ici -->
     </select>
-    <input type="submit" value="Filtrer">
 </form>
 
 <!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
