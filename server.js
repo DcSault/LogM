@@ -16,9 +16,9 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
 require('dotenv').config({ path: './redis.env' });
-const redis = require('redis');
+const Redis = require('ioredis');
 
-const client = redis.createClient({
+const client = new Redis({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
     password: process.env.REDIS_PASSWORD
@@ -33,19 +33,22 @@ client.on('error', function(err) {
 });
 
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers', 'DcSault', 'username2', (err, reply) => {
-    if (err) throw err;
+client.sadd('allowedUsers', 'DcSault', 'username2').then(reply => {
     console.log(reply); // nombre d'éléments ajoutés
+}).catch(err => {
+    console.error('Erreur lors de l\'ajout:', err);
 });
 
 // Vérification si un utilisateur est autorisé
-client.sismember('allowedUsers', 'DcSault', function(err, reply) {
+client.sismember('allowedUsers', 'DcSault').then(reply => {
     if (reply === 1) {
         console.log('L\'utilisateur est autorisé');
     } else {
         console.log('L\'utilisateur n\'est pas autorisé');
     }
-}); 
+}).catch(err => {
+    console.error('Erreur lors de la vérification:', err);
+});
  
  // Crée une instance de winston pour le logging
  const logger = winston.createLogger({
