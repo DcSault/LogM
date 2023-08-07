@@ -256,12 +256,17 @@ app.post('/edit-error', async (req, res) => {
 
 app.get('/filter', async (req, res) => {
     const category = req.query.category;
-    if (!category) {
-        return res.redirect('/'); 
-    }
     const filteredErrors = errors.filter(error => error.category === category);
-    res.render('index', { errors: filteredErrors });
+    
+    let maxId = Math.max(...errors.map(error => error.id));
+    let nextErrorId = maxId + 1;
+
+    res.render('index', { 
+        errors: filteredErrors, 
+        nextErrorId: nextErrorId 
+    });
 });
+
 
  
  // Démarrer le serveur
