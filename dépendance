@@ -6,6 +6,7 @@ npm install ejs
 npm install winston
 npm install redis
 npm install ioredis
+npm install ejs-lint -g
 
 | nomenclature du projet node | 
 
