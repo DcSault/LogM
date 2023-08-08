@@ -1,4 +1,23 @@
-/* Global Styles */
+/* -----------------
+   Error Box Style
+----------------- */
+.error-box {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.error-box:hover {
+    transform: translateY(-5px);  /* Ajoute un petit effet de soulèvement lors du survol */
+}
+
+/* -----------------
+   Global Styles
+----------------- */
 body {
     font-family: Arial, sans-serif;
     padding: 0 10%;
@@ -6,7 +25,9 @@ body {
     color: #333;
 }
 
-/* Glassmorphism Style */
+/* -----------------
+   Glassmorphism Base Style
+----------------- */
 .glass {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -15,20 +36,23 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Main Heading Style */
+/* -----------------
+   Headings
+----------------- */
 h1 {
     color: #FF6136;
     text-align: center;
     margin-bottom: 30px;
 }
 
-/* Sub Heading Style */
 h2 {
     color: #FF6136;
     margin-top: 20px;
 }
 
-/* Form and Div Styles */
+/* -----------------
+   Forms & Divs
+----------------- */
 form, div:not(.button-container) {
     margin-bottom: 20px;
     transition: background 0.3s ease;
@@ -38,7 +62,9 @@ form.glass:hover, div.glass:hover {
     background: rgba(255, 97, 54, 0.1);
 }
 
-/* Input Styles */
+/* -----------------
+   Input & Select
+----------------- */
 input[type="text"], select {
     width: 100%;
     padding: 10px;
@@ -50,7 +76,9 @@ input[type="text"], select {
     color: #333;
 }
 
-/* Button Styles */
+/* -----------------
+   Buttons
+----------------- */
 button {
     padding: 10px 20px;
     background-color: #FF6136;
@@ -65,14 +93,18 @@ button:hover {
     background-color: #e05530;
 }
 
-/* Button Container */
+/* -----------------
+   Button Container
+----------------- */
 .button-container {
     display: flex;
     justify-content: start;
     gap: 10px;
 }
 
-/* Paragraph Styles */
+/* -----------------
+   Paragraphs
+----------------- */
 p {
     color: #555;
 }
