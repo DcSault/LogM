@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     padding: 0 10%;
     background-color: #f9f9f9;
-    backdrop-filter: blur(10px); /* Pour ajouter un léger flou à l'arrière-plan */
+    backdrop-filter: blur(10px);
 }
 
 h1 {
@@ -11,14 +11,22 @@ h1 {
     margin-bottom: 30px;
 }
 
+h2 {
+    color: #FFA500;  /* Orange */
+}
+
+p {
+    color: #555;
+}
+
 form, div {
-    background-color: rgba(255, 255, 255, 0.1); /* Transparence */
+    background-color: rgba(255, 255, 255, 0.1);
     padding: 20px;
     margin-bottom: 20px;
-    border-radius: 15px; /* Coins plus arrondis */
-    backdrop-filter: blur(10px); /* Flou pour l'effet de verre */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure légèrement lumineuse */
-    box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06); /* Ombres douces */
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 input[type="text"] {
@@ -27,42 +35,34 @@ input[type="text"] {
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.1); /* Transparence */
-    backdrop-filter: blur(10px); /* Flou */
-    transition: all 0.3s; /* Transition douce lors de la mise au point */
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input[type="text"]:focus {
-    border: 1px solid #007bff; /* Changement de couleur lors de la mise au point */
-    box-shadow: 0px 0px 5px #007bff; /* Lueur lors de la mise au point */
+    border-color: #FFA500;  /* Orange */
+    box-shadow: 0px 0px 5px #FFA500;  /* Orange */
 }
 
 button {
     padding: 10px 20px;
-    background-color: rgba(0, 123, 255, 0.7); /* Légèrement transparent */
+    background-color: rgba(255, 165, 0, 0.7);  /* Orange transparent */
     color: #fff;
     border: none;
     border-radius: 15px;
     cursor: pointer;
     margin-right: 10px;
-    box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06); /* Ombres douces */
-    transition: all 0.3s; /* Transition douce lors du survol */
+    box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: rgba(0, 86, 179, 0.8); /* Légèrement transparent */
+    background-color: rgba(255, 140, 0, 0.8);  /* Orange foncé transparent */
 }
 
 .button-container {
     display: flex;
     justify-content: start;
     gap: 10px;
-}
-
-h2 {
-    color: #007bff;
-}
-
-p {
-    color: #555;
 }
