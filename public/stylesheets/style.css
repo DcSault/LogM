@@ -60,6 +60,39 @@ input[type="text"], select {
     background: rgba(255, 255, 255, 0.9); /* Fond légèrement transparent */
     backdrop-filter: blur(4px); /* Flou léger, moins prononcé que le Glassmorphism typique */
 }
+/* -----------------
+   Form Box Style
+----------------- */
+
+.form-box {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre douce */
+    transition: transform 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.form-box h2 {
+    color: #1f1f1f;
+    padding: 5px 10px;
+    margin-bottom: 20px;
+    background-color: rgba(230, 230, 230, 0.9); /* Couleur de fond légèrement différente de celle du h2 d'erreur */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* Ombre douce */
+}
+
+.form-box:hover {
+    transform: translateY(-5px);
+}
+
+.form-box button {
+    width: 100%;  /* Fait occuper tout l'espace disponible par le bouton */
+    margin-top: 20px;  /* Ajoute un espace en haut du bouton */
+}
+
 
 /* -----------------
    Error Box Style
