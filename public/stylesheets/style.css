@@ -3,21 +3,20 @@
 ----------------- */
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Segoe UI est la police standard de Microsoft */
     padding: 0 10%;
-    background-color: rgba(249, 249, 249, 0.8);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(to bottom right, #e1e1e1, #f5f5f5); /* Arrière-plan doux */
     transition: background-color 0.3s ease;
 }
 
 h1 {
-    color: #FF6136;
+    color: #1f1f1f; /* Noir doux pour le texte */
     text-align: center;
     margin-bottom: 30px;
 }
 
 h2 {
-    color: #FF6136;
+    color: #1f1f1f;
 }
 
 p {
@@ -28,30 +27,31 @@ p {
 button, select {
     border: none;
     padding: 10px 15px;
-    border-radius: 5px;
+    border-radius: 8px; /* Bords légèrement arrondis, typique du design Microsoft */
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 button {
-    background-color: #FF6136;
+    background-color: #0078D4; /* Couleur typique de Microsoft */
     color: white;
 }
 
 button:hover {
-    background-color: #d94f2b;
+    background-color: #005fa1;
+    transform: translateY(-2px); /* Un léger "lift" au survol pour une interaction tactile */
 }
 
 input[type="text"], select {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: 1px solid rgba(255, 97, 54, 0.3);
+    border: 2px solid #e1e1e1; /* Bordure subtile */
     box-sizing: border-box;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9); /* Fond légèrement transparent */
+    backdrop-filter: blur(4px); /* Flou léger, moins prononcé que le Glassmorphism typique */
 }
 
 /* -----------------
@@ -62,10 +62,11 @@ input[type="text"], select {
     margin-top: 50px;
     margin-bottom: 20px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre douce */
     transition: transform 0.3s ease;
 }
 
@@ -94,13 +95,14 @@ input[type="text"], select {
 
 .pagination a {
     padding: 5px 10px;
-    background-color: #FF6136;
+    background-color: #0078D4;
     color: white;
     text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 .pagination a:hover {
-    background-color: #d94f2b;
+    background-color: #005fa1;
+    transform: translateY(-2px);
 }
