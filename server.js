@@ -1,5 +1,8 @@
 // Importe les dépendances nécessaires
 require('dotenv').config({ path: './token.env' });
+require('dotenv').config({ path: './github.env' });
+require('dotenv').config({ path: './redis.env' });
+
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
@@ -15,7 +18,6 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
-require('dotenv').config({ path: './redis.env' });
 const Redis = require('ioredis');
 
 const client = new Redis({
@@ -86,9 +88,9 @@ client.sismember('allowedUsers', 'DcSault').then(reply => {
  
  // Stratégie GitHub
  passport.use(new GitHubStrategy({
-     clientID: "9fe69b4fa93a4b0597a4",
-     clientSecret: "1d2e822a0bd705cd4223b9e32a22e0b43888e4db",
-     callbackURL: "https://logm.onrender.com/auth/github/callback",
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: process.env.GITHUB_CALLBACK_URL,
     }, async (accessToken, refreshToken, profile, done) => {
         // Vérification si l'utilisateur est autorisé via Redis
         client.sismember('allowedUsers', profile.username, function(err, reply) {
