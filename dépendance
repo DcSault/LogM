@@ -12,19 +12,32 @@ npm install ejs-lint -g
 
 ---------------------------
 
-/
-├─ node_modules/
-├─ public/
-│  ├─ images/
-│  ├─ stylesheets/
-│  └─ javascripts/
-├─ views/
-│  ├─ errors/
-│  ├─ index.ejs
-│  └─ error.ejs
-├─ .env
-├─ app.js
-├─ package.json
-└─ README.md
+Projet Node.js
+|
+|-- node_modules/
+|   |-- (Dépendances du projet...)
+|
+|-- public/
+|   |-- images/
+|   |   |-- (Images du projet...)
+|   |-- stylesheets/
+|   |   |-- (Fichiers CSS...)
+|   |-- javascripts/
+|       |-- (Scripts JavaScript côté client...)
+|
+|-- views/
+|   |-- errors/
+|   |   |-- (Templates d'erreurs...)
+|   |-- index.ejs
+|   |-- error.ejs
+|
+|-- .env (Variables d'environnement et configurations secrètes)
+|
+|-- app.js (Point d'entrée de l'application)
+|
+|-- package.json (Métadonnées du projet et liste des dépendances)
+|
+|-- README.md (Documentation et instructions)
+
 
 ---------------------------
