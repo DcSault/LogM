@@ -53,7 +53,7 @@
 
 <!-- Boucle pour afficher chaque erreur de la liste des erreurs -->
 <% for(let i=0; i<errors.length; i++) { %>
-    <div>
+    <div class="error-box">
         <!-- Affichage des détails de chaque erreur -->
         <h2><%= errors[i].code %></h2>
         <p><%= errors[i].description %></p>
