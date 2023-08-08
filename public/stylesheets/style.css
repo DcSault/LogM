@@ -1,6 +1,62 @@
 /* -----------------
+   Global Styles
+----------------- */
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 0 10%;
+    background-color: rgba(249, 249, 249, 0.8);
+    backdrop-filter: blur(10px);
+    transition: background-color 0.3s ease;
+}
+
+h1 {
+    color: #FF6136;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #FF6136;
+}
+
+p {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+button, select {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button {
+    background-color: #FF6136;
+    color: white;
+}
+
+button:hover {
+    background-color: #d94f2b;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 97, 54, 0.3);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* -----------------
    Error Box Style
 ----------------- */
+
 .error-box {
     margin-bottom: 20px;
     padding: 20px;
@@ -12,99 +68,37 @@
 }
 
 .error-box:hover {
-    transform: translateY(-5px);  /* Ajoute un petit effet de soulèvement lors du survol */
-}
-
-/* -----------------
-   Global Styles
------------------ */
-body {
-    font-family: Arial, sans-serif;
-    padding: 0 10%;
-    background-image: linear-gradient(45deg, #f9f9f9, #e8e8e8);
-    color: #333;
-}
-
-/* -----------------
-   Glassmorphism Base Style
------------------ */
-.glass {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* -----------------
-   Headings
------------------ */
-h1 {
-    color: #FF6136;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-h2 {
-    color: #FF6136;
-    margin-top: 20px;
-}
-
-/* -----------------
-   Forms & Divs
------------------ */
-form, div:not(.button-container) {
-    margin-bottom: 20px;
-    transition: background 0.3s ease;
-}
-
-form.glass:hover, div.glass:hover {
-    background: rgba(255, 97, 54, 0.1);
-}
-
-/* -----------------
-   Input & Select
------------------ */
-input[type="text"], select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255, 97, 54, 0.5);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    color: #333;
-}
-
-/* -----------------
-   Buttons
------------------ */
-button {
-    padding: 10px 20px;
-    background-color: #FF6136;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background-color: #e05530;
+    transform: translateY(-5px);
 }
 
 /* -----------------
    Button Container
 ----------------- */
+
 .button-container {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     gap: 10px;
 }
 
 /* -----------------
-   Paragraphs
+   Pagination Styles
 ----------------- */
-p {
-    color: #555;
+
+.pagination {
+    display: flex;
+    gap: 10px;
+}
+
+.pagination a {
+    padding: 5px 10px;
+    background-color: #FF6136;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #d94f2b;
 }
