@@ -39,14 +39,14 @@ client.on('error', function(err) {
 
 
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers').then(reply => {
+client.sadd('allowedUsers, user').then(reply => {
     console.log(reply); // nombre d'éléments ajoutés
 }).catch(err => {
     console.error('Erreur lors de l\'ajout:', err);
 });
 
 // Vérification si un utilisateur est autorisé
-client.sismember('allowedUsers').then(reply => {
+client.sismember('allowedUsers, user').then(reply => {
     if (reply === 1) {
         console.log('L\'utilisateur est autorisé');
     } else {
