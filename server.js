@@ -124,7 +124,7 @@ client.sismember('allowedUsers', '__').then(reply => {
  const headers = { Authorization: `token ${token}` };
  const owner = 'DcSault';
  const repo = 'LogM_Json';
- const path = 'LogM_json';
+ const path = 'erreurs.json';
  const fileURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
  let errors = [];
  
