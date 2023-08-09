@@ -79,6 +79,6 @@ Lancez le serveur :
 ```
 node server.js
 ```
-Ouvrez votre navigateur à http://localhost:<port>.
+Ouvrez votre navigateur à http://localhost:<port>
 Utilisez l'application !
 
