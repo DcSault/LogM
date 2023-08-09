@@ -37,15 +37,16 @@ client.on('error', function(err) {
     console.error('Erreur Redis:', err);
 });
 
+
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers', 'username1', 'username2').then(reply => {
+client.sadd('allowedUsers').then(reply => {
     console.log(reply); // nombre d'éléments ajoutés
 }).catch(err => {
     console.error('Erreur lors de l\'ajout:', err);
 });
 
 // Vérification si un utilisateur est autorisé
-client.sismember('allowedUsers', 'DcSault').then(reply => {
+client.sismember('allowedUsers').then(reply => {
     if (reply === 1) {
         console.log('L\'utilisateur est autorisé');
     } else {
@@ -79,11 +80,6 @@ client.sismember('allowedUsers', 'DcSault').then(reply => {
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        httpOnly: true,               // empêche l'accès au cookie via JavaScript
-        secure: true,                 // garantit que le cookie n'est envoyé que sur HTTPS
-        maxAge: 60000                 // durée de vie du cookie en millisecondes (ici, 1 minute)
-    }
 }));
  
  // Configurer Passport
