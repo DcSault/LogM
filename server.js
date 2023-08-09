@@ -13,7 +13,6 @@ const winston = require('winston');
 const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
-const Redis = require('ioredis');
 
 
 // Les variables d'environnement
@@ -21,7 +20,7 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
-
+const Redis = require('ioredis');
 
 const client = new Redis({
     host: process.env.REDIS_HOST,
@@ -37,16 +36,15 @@ client.on('error', function(err) {
     console.error('Erreur Redis:', err);
 });
 
-
 // Exemple d'utilisation : Ajout d'un utilisateur autorisé
-client.sadd('allowedUsers, user').then(reply => {
+client.sadd('allowedUsers', 'username1', 'username2').then(reply => {
     console.log(reply); // nombre d'éléments ajoutés
 }).catch(err => {
     console.error('Erreur lors de l\'ajout:', err);
 });
 
 // Vérification si un utilisateur est autorisé
-client.sismember('allowedUsers, user').then(reply => {
+client.sismember('allowedUsers', '__').then(reply => {
     if (reply === 1) {
         console.log('L\'utilisateur est autorisé');
     } else {
