@@ -13,7 +13,7 @@ const winston = require('winston');
 const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
-const RedisStore = require('connect-redis')(session)
+const Redis = require('ioredis');
 
 
 // Les variables d'environnement
@@ -21,7 +21,7 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
-const Redis = require('ioredis');
+
 
 const client = new Redis({
     host: process.env.REDIS_HOST,
