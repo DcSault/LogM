@@ -25,7 +25,7 @@ Un outil simple pour enregistrer et gérer les erreurs. Suivez facilement les d�
 📄 package.json
 📄 README.md
 📄 server.js
-
+```
 
 ## 🖥 Fonctionnalités principales
 
@@ -71,12 +71,14 @@ L'interface permet à l'utilisateur :
 
 ```bash
 npm install
+```
 
 💡 Utilisation
 Lancez le serveur :
-bash
-Copy code
+
+```
 node server.js
+```
 Ouvrez votre navigateur à http://localhost:<port>.
 Utilisez l'application !
 
