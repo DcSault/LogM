@@ -2,6 +2,7 @@
 require('dotenv').config({ path: './token.env' });
 require('dotenv').config({ path: './github.env' });
 require('dotenv').config({ path: './redis.env' });
+require('dotenv').config({ path: './session_secret.env' });
 
 const express = require('express');
 const axios = require('axios');
@@ -12,6 +13,8 @@ const winston = require('winston');
 const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
+const RedisStore = require('connect-redis')(session)
+
 
 // Les variables d'environnement
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -73,10 +76,15 @@ client.sismember('allowedUsers', 'DcSault').then(reply => {
  
  // Configurer la session express
  app.use(session({
-     secret: 'secret',
-     resave: false,
-     saveUninitialized: false,
- }));
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,               // empêche l'accès au cookie via JavaScript
+        secure: true,                 // garantit que le cookie n'est envoyé que sur HTTPS
+        maxAge: 60000                 // durée de vie du cookie en millisecondes (ici, 1 minute)
+    }
+}));
  
  // Configurer Passport
  app.use(passport.initialize());
