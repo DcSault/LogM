@@ -122,9 +122,9 @@ client.sismember('allowedUsers', '__').then(reply => {
  
  // Crée les en-têtes pour les requêtes axios vers GitHub
  const headers = { Authorization: `token ${token}` };
- const owner = 'DcSault';
- const repo = 'LogM_Json';
- const path = 'erreurs.json';
+ const owner = process.env.GITHUB_OWNER;
+ const repo = process.env.GITHUB_REPO;
+ const path = process.env.GITHUB_PATH;
  const fileURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
  let errors = [];
  
