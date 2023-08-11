@@ -7,7 +7,8 @@ const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
 const Redis = require('ioredis');
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require('express-redis-store')(session);
+
 
 
 // Configuration des fichiers d'environnement
@@ -58,15 +59,17 @@ app.use(express.static('public'));
 
 // ======== Configuration des sessions Express ========
 app.use(session({
-    store: new RedisStore({ client: redisClient }),
+    store: new RedisStore({
+        client: client,
+        ttl: 86400 // Durée de vie de la session en secondes, ici 24 heures. Ajustez selon vos besoins.
+    }),
     secret: process.env.SESSION_SECRET,
-    name: 'sessionId', // nom du cookie
-    resave: false,
-    saveUninitialized: false,
+    resave: false, // Force la session à être sauvegardée dans le store, même si la session n'a pas été modifiée pendant la requête
+    saveUninitialized: false, // Force la session qui est "non initialisée" à être sauvegardée dans le store. Une session est non initialisée lorsqu'elle est nouvelle mais pas modifiée.
     cookie: {
-        secure: process.env.NODE_ENV === 'production',  
-        httpOnly: true, 
-        maxAge: 1000 * 60 * 60 * 24 * 7  
+        secure: false, // Si vous utilisez HTTPS, mettez cette option à `true`
+        httpOnly: true,
+        maxAge: 86400000 // Durée de vie du cookie en millisecondes, ici 24 heures.
     }
 }));
 
