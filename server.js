@@ -17,6 +17,7 @@ require('dotenv').config({ path: './token.env' });
 require('dotenv').config({ path: './github.env' });
 require('dotenv').config({ path: './redis.env' });
 require('dotenv').config({ path: './session_secret.env' });
+require('dotenv').config({ path: 'ip.env' });
 
 // ======== Variables d'environnement ========
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -129,7 +130,19 @@ passport.use(new GitHubStrategy({
  
 // ======== Configuration des Route ========
  // Route GET pour la page d'accueil
- app.get('/', async (req, res) => {
+ app.use((req, res, next) => {
+    const ipAddress = req.ip;
+    const allowedIps = (process.env.ALLOWED_IPS || "").split(',');
+    if (allowedIps.includes(ipAddress)) {
+        console.log(`IP autorisée : ${ipAddress}`);
+        next();  // Continue vers la prochaine middleware ou route
+    } else {
+        console.log(`Accès interdit depuis l'IP: ${ipAddress}`);
+        next(new Error(`Accès interdit depuis l'IP: ${ipAddress}`));
+    }
+});
+
+app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
     if (!req.user) {
         return res.redirect('/auth/github');
