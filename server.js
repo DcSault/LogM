@@ -65,7 +65,7 @@ app.use(session({
     saveUninitialized: true,
     store: new RedisStore({ client: client }),
     cookie: {
-        secure: false,  // Si vous êtes en HTTPS, mettez cette option à true
+        secure: true,  // Si vous êtes en HTTPS, mettez cette option à true
         httpOnly: true,  // Assure que le cookie ne peut pas être lu par du JavaScript côté client
         maxAge: 24 * 60 * 60 * 1000  // Durée de vie du cookie en millisecondes (ici, 24 heures)
     }
@@ -95,17 +95,16 @@ passport.use(new GitHubStrategy({
         });
     }));
  
-//GitHub
-app.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/login' }),
-    (req, res) => {
-        if (req.isAuthenticated()) {
-            logger.info(`User ${req.user.username} authenticated successfully.`);
-        } else {
-            logger.warn("User authentication failed.");
-        }
-        res.redirect('/');
-    }
+//GitHub 
+ app.get('/auth/github', passport.authenticate('github'));
+ 
+ // Callback pour l'authentification GitHub
+ app.get('/auth/github/callback',
+     passport.authenticate('github', { failureRedirect: '/login' }),
+     (req, res) => {
+         // Authentification réussie, rediriger vers la page d'accueil
+         res.redirect('/');
+     }
  );
  
  // Récupère le token GitHub de l'environnement
