@@ -60,10 +60,15 @@ app.use(express.static('public'));
 
 // ======== Configuration des sessions Express ========
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET,  // Assurez-vous d'avoir défini cette variable d'environnement ou remplacez-la par une chaîne de caractères secrète unique
     resave: false,
     saveUninitialized: true,
-    store: new RedisStore({ client: client }),   // Seulement si vous utilisez Redis comme stockage de session
+    store: new RedisStore({ client: client }),
+    cookie: {
+        secure: false,  // Si vous êtes en HTTPS, mettez cette option à true
+        httpOnly: true,  // Assure que le cookie ne peut pas être lu par du JavaScript côté client
+        maxAge: 24 * 60 * 60 * 1000  // Durée de vie du cookie en millisecondes (ici, 24 heures)
+    }
 }));
 
 // ======== Configuration de Passport ========
