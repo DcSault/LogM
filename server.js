@@ -59,7 +59,7 @@ app.use(express.static('public'));
 
 // ======== Configuration des sessions Express ========
 app.use(session({
-    store: new RedisStore({ client: Redis }),
+    store: new RedisStore({ client: client }),  // Utilisez l'instance client ici
     secret: process.env.SESSION_SECRET,
     name: 'sessionId', // nom du cookie
     resave: false,
