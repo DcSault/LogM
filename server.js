@@ -240,33 +240,35 @@ app.post('/add-error', async (req, res) => {
     res.redirect('/');
  });
  
- app.post('/edit-error', (req, res) => {
-    redisClient.get('errors', (err, data) => {
-        if (err) {
-            res.status(500).send({ error: 'Failed to fetch errors from Redis' });
-            return;
-        }
-
-        const errors = JSON.parse(data || '[]');
-        const { id, code, description, solution, tda, category } = req.body;
-        const index = errors.findIndex(error => Number(error.id) === Number(id));
-        
-        if (index !== -1) {
-            errors[index] = { id: Number(id), code, description, solution, tda, category };
-
-            // Mise à jour du cache Redis
-            redisClient.set('errors', JSON.stringify(errors), (setErr) => {
-                if (setErr) {
-                    res.status(500).send({ error: 'Failed to update error in Redis' });
-                } else {
-                    res.redirect('/');
-                }
-            });
-        } else {
-            res.status(404).send({ error: 'Error not found' });
+ app.post('/edit-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+ 
+    const { code, description, solution, tda, category } = req.body;
+    const id = Number(req.body.id);
+    const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
+ 
+    // Si l'erreur est trouvée, met à jour l'erreur
+    if (index !== -1) {
+        errors[index] = { id, code, description, solution, tda, category };
+    }
+ 
+    // Log la modification de l'erreur
+    logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+ 
+    // Save to Redis
+    client.set('errors', JSON.stringify(errors), (err) => {
+        if(err) {
+            logger.error(`Failed to save errors to Redis: ${err}`);
         }
     });
-});
+ 
+    // Redirige vers la page d'accueil
+    res.redirect('/');
+ });
+
 
  
 app.delete('/delete-error', (req, res) => {
