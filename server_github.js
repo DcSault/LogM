@@ -158,161 +158,156 @@ app.get('/', async (req, res) => {
 
     const page = req.query.page ? Number(req.query.page) : 1;
 
-    // Récupère les erreurs depuis Redis
-    client.get('errors', (err, result) => {
-        if (err) {
-            logger.error(err); // Log l'erreur si une se produit
-            return res.status(500).send('Erreur lors de la récupération des erreurs.');
-        }
-
-        const allErrors = JSON.parse(result) || [];
-
-        // Filtrer les erreurs selon le service et l'environnement
-        const service = req.query.service;
-        const environment = req.query.environment;
-
-        let filteredErrors = allErrors;
-
-        if (service) {
-            filteredErrors = filteredErrors.filter(error => error.service === service);
-        }
-
-        if (environment) {
-            filteredErrors = filteredErrors.filter(error => error.environment === environment);
-        }
-
+    // Récupère les erreurs depuis GitHub
+    try {
+        const { data: { content } } = await axios.get(fileURL, { headers });
+        errors = JSON.parse(Buffer.from(content, 'base64').toString());
+        
         // Met à jour nextErrorId pour qu'il soit un de plus que le plus grand id actuel
-        if (filteredErrors.length > 0) {
-            nextErrorId = Math.max(...filteredErrors.map(error => Number(error.id))) + 1;
+        if (errors.length > 0) {
+            nextErrorId = Math.max(...errors.map(error => Number(error.id))) + 1;
         }
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
 
-        // Pagination des erreurs
-        const offset = (page - 1) * perPage;
-        const pagedErrors = filteredErrors.slice(offset, offset + perPage);
-        const totalPages = Math.ceil(filteredErrors.length / perPage);
+    // Pagination des erreurs
+    const offset = (page - 1) * perPage;
+    const pagedErrors = errors.slice(offset, offset + perPage);
+    const totalPages = Math.ceil(errors.length / perPage);
 
-        // Rend le template avec les erreurs paginées et les informations de pagination
-        res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
-    });
+    // Rend le template avec les erreurs paginées et les informations de pagination
+    res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
 
 // Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
-    // Vérifie si l'utilisateur est authentifié
+   // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+   if (!req.user) {
+       return res.redirect('/auth/github');
+   }
+
+   // Créez un nouvel objet "error" avec le champ "category" ajouté
+   const error = {
+       id: nextErrorId++,  // Incrémente l'id
+       code: req.body.code,
+       description: req.body.description,
+       solution: req.body.solution,
+       tda: req.body.tda,
+       category: req.body.category  // Récupérez la catégorie du formulaire
+   };
+
+   errors.push(error); // Ajoute l'erreur à la liste
+
+   // Log l'ajout de l'erreur
+   logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
+
+   // Met à jour les erreurs sur GitHub
+   try {
+       const { data: { sha } } = await axios.get(fileURL, { headers });
+       await axios.put(fileURL, {
+           message: 'Ajouter une nouvelle erreur',
+           content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+           sha,
+       }, { headers });
+   } catch (error) {
+       logger.error(error); // Log l'erreur si une se produit
+   }
+
+   // Redirige vers la page d'accueil
+   res.redirect('/');
+});
+
+// Route POST pour modifier une erreur
+app.post('/edit-error', async (req, res) => {
+   // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+   if (!req.user) {
+       return res.redirect('/auth/github');
+   }
+
+   const { code, description, solution, tda, category } = req.body;
+   const id = Number(req.body.id);
+   const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
+
+   // Si l'erreur est trouvée, met à jour l'erreur
+   if (index !== -1) {
+       errors[index] = { id, code, description, solution, tda, category };
+   }
+
+   // Log la modification de l'erreur
+   logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+   // Met à jour les erreurs sur GitHub
+   try {
+       const { data: { sha } } = await axios.get(fileURL, { headers });
+       await axios.put(fileURL, {
+           message: 'Modifier une erreur',
+           content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+           sha,
+       }, { headers });
+   } catch (error) {
+       logger.error(error); // Log l'erreur si une se produit
+   }
+
+   // Redirige vers la page d'accueil
+   res.redirect('/');
+});
+
+// Route POST pour supprimer une erreur
+app.post('/delete-error', async (req, res) => {
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
     if (!req.user) {
         return res.redirect('/auth/github');
     }
-    // Récupère les détails de l'erreur depuis le formulaire et ajoute à la liste
-    const error = {
-        id: nextErrorId++,
-        code: req.body.code,
-        description: req.body.description,
-        solution: req.body.solution,
-        tda: req.body.tda,
-        category: req.body.category
-    };
-    errors.push(error);
- 
-    // Enregistre l'ajout de l'erreur dans les logs
-    logger.info(`User: ${req.user.username}, Added error: ${JSON.stringify(error)}`);
- 
-    // Mise à jour de la liste d'erreurs sur GitHub
-    try {
-        const { data: { sha } } = await axios.get(fileURL, { headers });
-        await axios.put(fileURL, {
-            message: 'Added a new error',
-            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-            sha,
-        }, { headers });
-    } catch (error) {
-        // En cas d'erreur lors de la mise à jour, la log
-        logger.error(error);
-    }
- 
-    res.redirect('/');
- });
- 
- // Route POST pour modifier une erreur existante
- app.post('/edit-error', async (req, res) => {
-    if (!req.user) {
-        return res.redirect('/auth/github');
-    }
- 
-    // Trouve l'erreur par son ID et effectue les modifications nécessaires
-    const { code, description, solution, tda, category } = req.body;
-    const id = Number(req.body.id);
-    const index = errors.findIndex(error => Number(error.id) === id);
-    if (index !== -1) {
-        errors[index] = { id, code, description, solution, tda, category };
-    }
-    logger.info(`User: ${req.user.username}, Edited error: ${JSON.stringify(errors[index])}`);
-    try {
-        const { data: { sha } } = await axios.get(fileURL, { headers });
-        await axios.put(fileURL, {
-            message: 'Edited an error',
-            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-            sha,
-        }, { headers });
-    } catch (error) {
-        logger.error(error);
-    }
-    res.redirect('/');
- });
- 
- // Route POST pour supprimer une erreur
- app.post('/delete-error', async (req, res) => {
-    if (!req.user) {
-        return res.redirect('/auth/github');
-    }
- 
-    // Trouve l'erreur par son ID et la supprime de la liste
+
     const { id } = req.body;
-    const index = errors.findIndex(error => Number(error.id) == id);
+    const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, supprime l'erreur de la liste
+
     if (index !== -1) {
         errors.splice(index, 1);
     }
- 
     // Log la suppression de l'erreur
-    logger.info(`User: ${req.user.username}, Deleted error: ${JSON.stringify(req.body)}`);
-    
-    // Mise à jour de la liste d'erreurs sur GitHub après suppression
+
+    logger.info(`User: ${req.user.username}, Deleting error: ${JSON.stringify(req.body)}`);
+
+    // Met à jour les erreurs sur GitHub
     try {
         const { data: { sha } } = await axios.get(fileURL, { headers });
         await axios.put(fileURL, {
-            message: 'Deleted an error',
+            message: 'Supprimer une erreur',
             content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
             sha,
         }, { headers });
     } catch (error) {
-        logger.error(error);
+        logger.error(error); // Log l'erreur si une se produit
     }
- 
+
+    // Redirige vers la page d'accueil
     res.redirect('/');
- });
- 
- // Route pour filtrer les erreurs par catégorie
- app.get('/filter', async (req, res) => {
-    const category = req.query.category;
-    // Si aucune catégorie n'est spécifiée, affiche toutes les erreurs
-    if (!category) {
-        res.render('index', { 
-            errors: errors, 
-            nextErrorId: errors.length + 1,
-            totalPages: Math.ceil(errors.length / 3)  
-        });
-        return;
-    }
- 
-    // Filtrage des erreurs en fonction de la catégorie
-    const filteredErrors = errors.filter(error => error.category === category);
-    const totalPages = Math.ceil(filteredErrors.length / 3);
- 
-    res.render('index', {
-        errors: filteredErrors,
-        nextErrorId: filteredErrors.length + 1,
-        totalPages
-    });
- });
+});
+
+app.get('/filter', async (req, res) => {
+   const category = req.query.category;
+   if (!category) {
+       res.render('index', { 
+           errors: errors, 
+           nextErrorId: errors.length + 1,
+           totalPages: Math.ceil(errors.length / 3)  
+       });
+       return;
+   }
+
+   const filteredErrors = errors.filter(error => error.category === category);
+   const totalPages = Math.ceil(filteredErrors.length / 3);
+
+   res.render('index', { 
+       errors: filteredErrors, 
+       nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
+       totalPages: totalPages
+   });
+});
 
 // Clear Debug 
 
