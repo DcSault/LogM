@@ -151,6 +151,10 @@ app.use((err, req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     try {
         const reply = await client.get('errors');
         const errors = JSON.parse(reply) || [];
@@ -168,11 +172,14 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/add-error', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     try {
         const reply = await client.get('errors');
         const errors = JSON.parse(reply) || [];
 
-        // Votre logique pour ajouter une erreur, par exemple :
         const error = {
             id: nextErrorId++,
             code: req.body.code,
@@ -183,6 +190,9 @@ app.post('/add-error', async (req, res) => {
         };
         errors.push(error);
 
+        // Log l'ajout de l'erreur
+        logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
+
         await client.set('errors', JSON.stringify(errors));
         res.redirect('/');
     } catch (err) {
@@ -192,6 +202,10 @@ app.post('/add-error', async (req, res) => {
 });
 
 app.post('/edit-error', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     try {
         const reply = await client.get('errors');
         const errors = JSON.parse(reply) || [];
@@ -202,6 +216,10 @@ app.post('/edit-error', async (req, res) => {
 
         if (index !== -1) {
             errors[index] = { id, code, description, solution, tda, category };
+
+            // Log la modification de l'erreur
+            logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
             await client.set('errors', JSON.stringify(errors));
         }
         res.redirect('/');
@@ -212,6 +230,10 @@ app.post('/edit-error', async (req, res) => {
 });
 
 app.post('/delete-error', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     try {
         const reply = await client.get('errors');
         const errors = JSON.parse(reply) || [];
@@ -221,6 +243,10 @@ app.post('/delete-error', async (req, res) => {
 
         if (index !== -1) {
             errors.splice(index, 1);
+
+            // Log la suppression de l'erreur
+            logger.info(`User: ${req.user.username}, Deleting error: ${JSON.stringify(req.body)}`);
+
             await client.set('errors', JSON.stringify(errors));
         }
         res.redirect('/');
@@ -231,6 +257,10 @@ app.post('/delete-error', async (req, res) => {
 });
 
 app.get('/filter', async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/auth/github');
+    }
+
     try {
         const reply = await client.get('errors');
         const errors = JSON.parse(reply) || [];
