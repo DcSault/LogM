@@ -202,6 +202,7 @@ app.post('/add-error', async (req, res) => {
     if (!req.user) {
         return res.redirect('/auth/github');
     }
+
     // Récupère les détails de l'erreur depuis le formulaire et ajoute à la liste
     const error = {
         id: nextErrorId++,
@@ -215,7 +216,14 @@ app.post('/add-error', async (req, res) => {
  
     // Enregistre l'ajout de l'erreur dans les logs
     logger.info(`User: ${req.user.username}, Added error: ${JSON.stringify(error)}`);
- 
+
+    // Save to Redis
+    client.set('errors', JSON.stringify(errors), (err) => {
+        if(err) {
+            logger.error(`Failed to save errors to Redis: ${err}`);
+        }
+    });
+
     // Mise à jour de la liste d'erreurs sur GitHub
     try {
         const { data: { sha } } = await axios.get(fileURL, { headers });
@@ -232,7 +240,6 @@ app.post('/add-error', async (req, res) => {
     res.redirect('/');
  });
  
- // Route POST pour modifier une erreur existante
  app.post('/edit-error', async (req, res) => {
     if (!req.user) {
         return res.redirect('/auth/github');
@@ -257,10 +264,9 @@ app.post('/add-error', async (req, res) => {
         logger.error(error);
     }
     res.redirect('/');
- });
+});
  
- // Route POST pour supprimer une erreur
- app.post('/delete-error', async (req, res) => {
+app.post('/delete-error', async (req, res) => {
     if (!req.user) {
         return res.redirect('/auth/github');
     }
@@ -288,7 +294,7 @@ app.post('/add-error', async (req, res) => {
     }
  
     res.redirect('/');
- });
+});
  
  // Route pour filtrer les erreurs par catégorie
  app.get('/filter', async (req, res) => {
