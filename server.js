@@ -63,7 +63,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: new RedisStore({ client: redisClient })  // Seulement si vous utilisez Redis comme stockage de session
+    store: new RedisStore({ client: client }),   // Seulement si vous utilisez Redis comme stockage de session
 }));
 
 // ======== Configuration de Passport ========
