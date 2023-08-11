@@ -62,14 +62,8 @@ app.use(express.static('public'));
 app.use(session({
     store: new RedisStore({ client: client }),  // Utilisez l'instance client ici
     secret: process.env.SESSION_SECRET,
-    name: 'sessionId', // nom du cookie
     resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,  // assurez-vous que le cookie est seulement utilisé sur https
-        httpOnly: true, // empêche l'accès au cookie depuis JavaScript côté client
-        maxAge: 1000 * 60 * 60 * 24 * 7  // cookie valable pour 7 jours
-    }
+    saveUninitialized: ture,
 }));
 
 // ======== Configuration de Passport ========
