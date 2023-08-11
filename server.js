@@ -86,10 +86,10 @@ passport.use(new GitHubStrategy({
         // Vérification si l'utilisateur est autorisé via Redis
         client.sismember('allowedUsers', profile.username, function(err, reply) {
             if (reply === 1) {
-                logger.info(`User: ${profile.username}, Authenticated successfully via GitHub`);
+                logger.info(`User: ${profile.username}, Authenticated successfully via GitHub. Session ID: ${req.sessionID}`);
                 done(null, profile);
             } else {
-                logger.info(`User: ${profile.username}, Failed to authenticate via GitHub`);
+                logger.info(`User: ${profile.username}, Failed to authenticate via GitHub. Session ID: ${req.sessionID}`);
                 done(new Error('User not authorized'));
             }
         });
