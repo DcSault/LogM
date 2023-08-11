@@ -66,7 +66,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === 'production',  // assurez-vous que le cookie est seulement utilisé sur https
-        httpOnly: true, // empêche l'accès au cookie depuis JavaScript côté client
+        httpOnly: false, // empêche l'accès au cookie depuis JavaScript côté client
         maxAge: 1000 * 60 * 60 * 24 * 7  // cookie valable pour 7 jours
     }
 }));
