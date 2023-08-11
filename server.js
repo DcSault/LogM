@@ -60,10 +60,10 @@ app.use(express.static('public'));
 
 // ======== Configuration des sessions Express ========
 app.use(session({
-    store: new RedisStore({ client: client }),  // Utilisez l'instance client ici
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: ture,
+    saveUninitialized: true,
+    store: new RedisStore({ client: redisClient })  // Seulement si vous utilisez Redis comme stockage de session
 }));
 
 // ======== Configuration de Passport ========
