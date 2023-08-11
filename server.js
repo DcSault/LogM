@@ -86,10 +86,10 @@ passport.use(new GitHubStrategy({
         // Vérification si l'utilisateur est autorisé via Redis
         client.sismember('allowedUsers', profile.username, function(err, reply) {
             if (reply === 1) {
-                logger.info(`User: ${profile.username}, Authenticated successfully via GitHub. Session ID: ${req.sessionID}`);
+                logger.info(`User: ${profile.username}, Authenticated successfully via GitHub`);
                 done(null, profile);
             } else {
-                logger.info(`User: ${profile.username}, Failed to authenticate via GitHub. Session ID: ${req.sessionID}`);
+                logger.info(`User: ${profile.username}, Failed to authenticate via GitHub`);
                 done(new Error('User not authorized'));
             }
         });
@@ -98,13 +98,19 @@ passport.use(new GitHubStrategy({
  app.get('/auth/github', passport.authenticate('github'));
  
  // Callback pour l'authentification GitHub
- app.get('/auth/github/callback',
-     passport.authenticate('github', { failureRedirect: '/login' }),
-     (req, res) => {
-         // Authentification réussie, rediriger vers la page d'accueil
+ app.get('/auth/github/callback', 
+ passport.authenticate('github', { failureRedirect: '/' }),
+ (req, res) => {
+     if (req.isAuthenticated()) {
+         logger.info(`User: ${req.user.username}, Authenticated successfully via GitHub. Session ID: ${req.sessionID}`);
+         // Redirigez vers la page d'accueil ou une autre page après authentification
          res.redirect('/');
+     } else {
+         logger.info(`User: ${req.user.username}, Failed to authenticate via GitHub. Session ID: ${req.sessionID}`);
+         res.redirect('/login');
      }
- );
+ }
+);
  
  // Récupère le token GitHub de l'environnement
  const token = process.env.GITHUB_TOKEN;
