@@ -1,14 +1,14 @@
 // ======== Importations ========
 const express = require('express');
-const axios = require('axios');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
-const os = require('os');
 const winston = require('winston');
 const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
 const Redis = require('ioredis');
+const RedisStore = require('connect-redis')(session);
+
 
 // Configuration des fichiers d'environnement
 require('dotenv').config({ path: './token.env' });
@@ -36,6 +36,7 @@ client.on('error', function(err) {
     console.error('Erreur Redis:', err);
 });
 
+
 // ======== Configuration de Winston (Logging) ========
 const logger = winston.createLogger({
      level: 'info',
@@ -57,9 +58,16 @@ app.use(express.static('public'));
 
 // ======== Configuration des sessions Express ========
 app.use(session({
+    store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET,
+    name: 'sessionId', // nom du cookie
     resave: false,
     saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',  
+        httpOnly: true, 
+        maxAge: 1000 * 60 * 60 * 24 * 7  
+    }
 }));
 
 // ======== Configuration de Passport ========
@@ -230,7 +238,7 @@ app.post('/delete-error', async (req, res) => {
     const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
 
     // Si l'erreur est trouvée, supprime l'erreur de la liste
-    
+
     if (index !== -1) {
         errors.splice(index, 1);
     }
