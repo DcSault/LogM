@@ -252,20 +252,20 @@ app.post('/delete-error', async (req, res) => {
     res.redirect('/');
 });
 
-app.get('/filter/:category', async (req, res) => {
+// app.get('/filter/:category', async (req, res) => {
    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
-   if (!req.user) {
-       return res.redirect('/auth/github');
-   }
+//   if (!req.user) {
+//       return res.redirect('/auth/github');
+//   }
 
-   const category = req.params.category;
-   const filteredErrors = errors.filter(error => error.category === category);
+//   const category = req.params.category;
+ //  const filteredErrors = errors.filter(error => error.category === category);
 
    // Log pour le filtrage des erreurs
-   logger.info(`User: ${req.user.username}, Filtering errors by category: ${category}`);
+//   logger.info(`User: ${req.user.username}, Filtering errors by category: ${category}`);
 
-   res.render('errors', { errors: filteredErrors });
-});
+//   res.render('errors', { errors: filteredErrors });
+//});
 
 app.get('/filter', async (req, res) => {
    // Assumons que vous avez un tableau d'erreurs nommé 'errors'
@@ -276,13 +276,13 @@ app.get('/filter', async (req, res) => {
        res.render('index', { 
            errors: errors, 
            nextErrorId: errors.length + 1,
-           totalPages: Math.ceil(errors.length / 10)  // 10 est supposé être le nombre d'items par page
+           totalPages: Math.ceil(errors.length / 3)  
        });
        return;
    }
 
    const filteredErrors = errors.filter(error => error.category === category);
-   const totalPages = Math.ceil(filteredErrors.length / 10);  // 10 est supposé être le nombre d'items par page
+   const totalPages = Math.ceil(filteredErrors.length / 3);
 
    res.render('index', { 
        errors: filteredErrors, 
