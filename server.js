@@ -85,26 +85,35 @@ passport.use(new GitHubStrategy({
             }
         });
     }));
-
-// ======== Routes d'authentification ========
-app.get('/auth/github', passport.authenticate('github'));
-app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('/');
-});
-
-// ======== Configuration des requêtes à l'API GitHub ========
-const token = process.env.GITHUB_TOKEN;
-const headers = { Authorization: `token ${token}` };
-const owner = process.env.GITHUB_OWNER;
-const repo = process.env.GITHUB_REPO;
-const path = process.env.GITHUB_PATH;
-const fileURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-let errors = [];
-const perPage = 3;  
-let nextErrorId = 1;
-
-// ======== Routes de l'application ========
+ 
+ app.get('/auth/github', passport.authenticate('github'));
+ 
+ // Callback pour l'authentification GitHub
+ app.get('/auth/github/callback',
+     passport.authenticate('github', { failureRedirect: '/login' }),
+     (req, res) => {
+         // Authentification réussie, rediriger vers la page d'accueil
+         res.redirect('/');
+     }
+ );
+ 
+ // Récupère le token GitHub de l'environnement
+ const token = process.env.GITHUB_TOKEN;
+ 
+ // Crée les en-têtes pour les requêtes axios vers GitHub
+ const headers = { Authorization: `token ${token}` };
+ const owner = process.env.GITHUB_OWNER;
+ const repo = process.env.GITHUB_REPO;
+ const path = process.env.GITHUB_PATH;
+ const fileURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+ let errors = [];
+ 
+ // Nombre d'erreurs par page pour la pagination
+ const perPage = 3;  
+ 
+ // Initialise l'id de la prochaine erreur
+ let nextErrorId = 1;  
+ 
  // Route GET pour la page d'accueil
  app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
