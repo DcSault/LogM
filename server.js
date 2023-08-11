@@ -130,6 +130,7 @@ passport.use(new GitHubStrategy({
  
 // ======== Configuration des Route ========
  // Route GET pour la page d'accueil
+ app.set('trust proxy', true);
  app.use((req, res, next) => {
     const ipAddress = req.ip;
     const allowedIps = (process.env.ALLOWED_IPS || "").split(',');
