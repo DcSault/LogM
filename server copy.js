@@ -129,9 +129,9 @@ passport.use(new GitHubStrategy({
  let nextErrorId = 1;  
  
 // ======== Configuration des Route ========
-
-app.set('trust proxy', true);
-app.use((req, res, next) => {
+ // Route GET pour la page d'accueil
+ app.set('trust proxy', true);
+ app.use((req, res, next) => {
     const ipAddress = req.ip;
     const allowedIps = (process.env.ALLOWED_IPS || "").split(',');
     if (allowedIps.includes(ipAddress)) {
@@ -146,111 +146,167 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     console.error(err.message);
     if (!res.headersSent) {
-        res.status(403).send(err.message);
+        res.status(403).send(err.message); 
     }
 });
 
 app.get('/', async (req, res) => {
-    try {
-        const reply = await client.get('errors');
-        const errors = JSON.parse(reply) || [];
-
-        const page = req.query.page ? Number(req.query.page) : 1;
-        const offset = (page - 1) * perPage;
-        const pagedErrors = errors.slice(offset, offset + perPage);
-        const totalPages = Math.ceil(errors.length / perPage);
-
-        res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Erreur interne du serveur');
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
     }
+
+    const page = req.query.page ? Number(req.query.page) : 1;
+
+    // Récupère les erreurs depuis GitHub
+    try {
+        const { data: { content } } = await axios.get(fileURL, { headers });
+        errors = JSON.parse(Buffer.from(content, 'base64').toString());
+        
+        // Met à jour nextErrorId pour qu'il soit un de plus que le plus grand id actuel
+        if (errors.length > 0) {
+            nextErrorId = Math.max(...errors.map(error => Number(error.id))) + 1;
+        }
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Pagination des erreurs
+    const offset = (page - 1) * perPage;
+    const pagedErrors = errors.slice(offset, offset + perPage);
+    const totalPages = Math.ceil(errors.length / perPage);
+
+    // Rend le template avec les erreurs paginées et les informations de pagination
+    res.render('index', { errors: pagedErrors, totalPages, currentPage: page, nextErrorId });
 });
 
+// Route POST pour ajouter une erreur
 app.post('/add-error', async (req, res) => {
-    try {
-        const reply = await client.get('errors');
-        const errors = JSON.parse(reply) || [];
+   // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+   if (!req.user) {
+       return res.redirect('/auth/github');
+   }
 
-        // Votre logique pour ajouter une erreur, par exemple :
-        const error = {
-            id: nextErrorId++,
-            code: req.body.code,
-            description: req.body.description,
-            solution: req.body.solution,
-            tda: req.body.tda,
-            category: req.body.category
-        };
-        errors.push(error);
+   // Créez un nouvel objet "error" avec le champ "category" ajouté
+   const error = {
+       id: nextErrorId++,  // Incrémente l'id
+       code: req.body.code,
+       description: req.body.description,
+       solution: req.body.solution,
+       tda: req.body.tda,
+       category: req.body.category  // Récupérez la catégorie du formulaire
+   };
 
-        await client.set('errors', JSON.stringify(errors));
-        res.redirect('/');
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Erreur interne du serveur');
-    }
+   errors.push(error); // Ajoute l'erreur à la liste
+
+   // Log l'ajout de l'erreur
+   logger.info(`User: ${req.user.username}, Adding error: ${JSON.stringify(error)}`);
+
+   // Met à jour les erreurs sur GitHub
+   try {
+       const { data: { sha } } = await axios.get(fileURL, { headers });
+       await axios.put(fileURL, {
+           message: 'Ajouter une nouvelle erreur',
+           content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+           sha,
+       }, { headers });
+   } catch (error) {
+       logger.error(error); // Log l'erreur si une se produit
+   }
+
+   // Redirige vers la page d'accueil
+   res.redirect('/');
 });
 
+// Route POST pour modifier une erreur
 app.post('/edit-error', async (req, res) => {
-    try {
-        const reply = await client.get('errors');
-        const errors = JSON.parse(reply) || [];
+   // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+   if (!req.user) {
+       return res.redirect('/auth/github');
+   }
 
-        const { code, description, solution, tda, category } = req.body;
-        const id = Number(req.body.id);
-        const index = errors.findIndex(error => Number(error.id) === id);
+   const { code, description, solution, tda, category } = req.body;
+   const id = Number(req.body.id);
+   const index = errors.findIndex(error => Number(error.id) === id);  // Trouve l'erreur par son id
 
-        if (index !== -1) {
-            errors[index] = { id, code, description, solution, tda, category };
-            await client.set('errors', JSON.stringify(errors));
-        }
-        res.redirect('/');
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Erreur interne du serveur');
-    }
+   // Si l'erreur est trouvée, met à jour l'erreur
+   if (index !== -1) {
+       errors[index] = { id, code, description, solution, tda, category };
+   }
+
+   // Log la modification de l'erreur
+   logger.info(`User: ${req.user.username}, Editing error: ${JSON.stringify(errors[index])}`);
+
+   // Met à jour les erreurs sur GitHub
+   try {
+       const { data: { sha } } = await axios.get(fileURL, { headers });
+       await axios.put(fileURL, {
+           message: 'Modifier une erreur',
+           content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+           sha,
+       }, { headers });
+   } catch (error) {
+       logger.error(error); // Log l'erreur si une se produit
+   }
+
+   // Redirige vers la page d'accueil
+   res.redirect('/');
 });
 
+// Route POST pour supprimer une erreur
 app.post('/delete-error', async (req, res) => {
-    try {
-        const reply = await client.get('errors');
-        const errors = JSON.parse(reply) || [];
-
-        const id = Number(req.body.id);
-        const index = errors.findIndex(error => Number(error.id) === id);
-
-        if (index !== -1) {
-            errors.splice(index, 1);
-            await client.set('errors', JSON.stringify(errors));
-        }
-        res.redirect('/');
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Erreur interne du serveur');
+    // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
+    if (!req.user) {
+        return res.redirect('/auth/github');
     }
+
+    const { id } = req.body;
+    const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
+
+    // Si l'erreur est trouvée, supprime l'erreur de la liste
+
+    if (index !== -1) {
+        errors.splice(index, 1);
+    }
+    // Log la suppression de l'erreur
+
+    logger.info(`User: ${req.user.username}, Deleting error: ${JSON.stringify(req.body)}`);
+
+    // Met à jour les erreurs sur GitHub
+    try {
+        const { data: { sha } } = await axios.get(fileURL, { headers });
+        await axios.put(fileURL, {
+            message: 'Supprimer une erreur',
+            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
+            sha,
+        }, { headers });
+    } catch (error) {
+        logger.error(error); // Log l'erreur si une se produit
+    }
+
+    // Redirige vers la page d'accueil
+    res.redirect('/');
 });
 
 app.get('/filter', async (req, res) => {
-    try {
-        const reply = await client.get('errors');
-        const errors = JSON.parse(reply) || [];
+   const category = req.query.category;
+   if (!category) {
+       res.render('index', { 
+           errors: errors, 
+           nextErrorId: errors.length + 1,
+           totalPages: Math.ceil(errors.length / 3)  
+       });
+       return;
+   }
 
-        const category = req.query.category;
-        let filteredErrors = errors;
-        if (category) {
-            filteredErrors = errors.filter(error => error.category === category);
-        }
+   const filteredErrors = errors.filter(error => error.category === category);
+   const totalPages = Math.ceil(filteredErrors.length / 3);
 
-        const totalPages = Math.ceil(filteredErrors.length / perPage);
-        res.render('index', {
-            errors: filteredErrors,
-            nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
-            totalPages: totalPages
-        });
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Erreur interne du serveur');
-    }
+   res.render('index', { 
+       errors: filteredErrors, 
+       nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
+       totalPages: totalPages
+   });
 });
 
 // Clear Debug 
