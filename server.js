@@ -240,85 +240,98 @@ app.post('/add-error', async (req, res) => {
     res.redirect('/');
  });
  
- app.post('/edit-error', async (req, res) => {
-    if (!req.user) {
-        return res.redirect('/auth/github');
-    }
- 
-    // Trouve l'erreur par son ID et effectue les modifications nécessaires
-    const { code, description, solution, tda, category } = req.body;
-    const id = Number(req.body.id);
-    const index = errors.findIndex(error => Number(error.id) === id);
-    if (index !== -1) {
-        errors[index] = { id, code, description, solution, tda, category };
-    }
-    logger.info(`User: ${req.user.username}, Edited error: ${JSON.stringify(errors[index])}`);
-    try {
-        const { data: { sha } } = await axios.get(fileURL, { headers });
-        await axios.put(fileURL, {
-            message: 'Edited an error',
-            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-            sha,
-        }, { headers });
-    } catch (error) {
-        logger.error(error);
-    }
-    res.redirect('/');
+ app.post('/edit-error', (req, res) => {
+    redisClient.get('errors', (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Failed to fetch errors from Redis' });
+            return;
+        }
+
+        const errors = JSON.parse(data || '[]');
+        const { id, code, description, solution, tda, category } = req.body;
+        const index = errors.findIndex(error => Number(error.id) === Number(id));
+        
+        if (index !== -1) {
+            errors[index] = { id: Number(id), code, description, solution, tda, category };
+
+            // Mise à jour du cache Redis
+            redisClient.set('errors', JSON.stringify(errors), (setErr) => {
+                if (setErr) {
+                    res.status(500).send({ error: 'Failed to update error in Redis' });
+                } else {
+                    res.redirect('/');
+                }
+            });
+        } else {
+            res.status(404).send({ error: 'Error not found' });
+        }
+    });
 });
+
  
-app.post('/delete-error', async (req, res) => {
-    if (!req.user) {
-        return res.redirect('/auth/github');
-    }
- 
-    // Trouve l'erreur par son ID et la supprime de la liste
-    const { id } = req.body;
-    const index = errors.findIndex(error => Number(error.id) == id);
-    if (index !== -1) {
-        errors.splice(index, 1);
-    }
- 
-    // Log la suppression de l'erreur
-    logger.info(`User: ${req.user.username}, Deleted error: ${JSON.stringify(req.body)}`);
-    
-    // Mise à jour de la liste d'erreurs sur GitHub après suppression
-    try {
-        const { data: { sha } } = await axios.get(fileURL, { headers });
-        await axios.put(fileURL, {
-            message: 'Deleted an error',
-            content: Buffer.from(JSON.stringify(errors, null, 2)).toString('base64'),
-            sha,
-        }, { headers });
-    } catch (error) {
-        logger.error(error);
-    }
- 
-    res.redirect('/');
+app.delete('/delete-error', (req, res) => {
+    redisClient.get('errors', (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Failed to fetch errors from Redis' });
+            return;
+        }
+
+        const errors = JSON.parse(data || '[]');
+        const id = req.body.id;
+        const index = errors.findIndex(error => Number(error.id) === Number(id));
+        
+        if (index !== -1) {
+            errors.splice(index, 1);
+
+            // Mise à jour du cache Redis
+            redisClient.set('errors', JSON.stringify(errors), (setErr) => {
+                if (setErr) {
+                    res.status(500).send({ error: 'Failed to delete error from Redis' });
+                } else {
+                    res.redirect('/');
+                }
+            });
+        } else {
+            res.status(404).send({ error: 'Error not found' });
+        }
+    });
 });
  
  // Route pour filtrer les erreurs par catégorie
- app.get('/filter', async (req, res) => {
+ app.get('/filter', (req, res) => {
     const category = req.query.category;
-    // Si aucune catégorie n'est spécifiée, affiche toutes les erreurs
-    if (!category) {
-        res.render('index', { 
-            errors: errors, 
-            nextErrorId: errors.length + 1,
-            totalPages: Math.ceil(errors.length / 3)  
+
+    // Récupération des erreurs depuis Redis
+    redisClient.get('errors', (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Failed to fetch errors from Redis' });
+            return;
+        }
+
+        const errors = JSON.parse(data || '[]');
+
+        // Si aucune catégorie n'est spécifiée, affiche toutes les erreurs
+        if (!category) {
+            res.render('index', { 
+                errors: errors, 
+                nextErrorId: errors.length + 1,
+                totalPages: Math.ceil(errors.length / 3)  
+            });
+            return;
+        }
+
+        // Filtrage des erreurs en fonction de la catégorie
+        const filteredErrors = errors.filter(error => error.category === category);
+        const totalPages = Math.ceil(filteredErrors.length / 3);
+
+        res.render('index', {
+            errors: filteredErrors,
+            nextErrorId: filteredErrors.length + 1,
+            totalPages
         });
-        return;
-    }
- 
-    // Filtrage des erreurs en fonction de la catégorie
-    const filteredErrors = errors.filter(error => error.category === category);
-    const totalPages = Math.ceil(filteredErrors.length / 3);
- 
-    res.render('index', {
-        errors: filteredErrors,
-        nextErrorId: filteredErrors.length + 1,
-        totalPages
     });
- });
+});
+
 
 // Clear Debug 
 
