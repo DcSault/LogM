@@ -284,5 +284,45 @@ app.get('/filter', async (req, res) => {
    });
 });
 
+// Clear Debug 
+
+app.get('/clear', async (req, res) => {
+    // Vérifier si l'utilisateur est authentifié
+    if (!req.isAuthenticated()) {
+        return res.status(401).send("Non autorisé");
+    }
+
+    // Vérifier si l'utilisateur authentifié est DcSault
+    if (req.user.username !== "DcSault") {
+        return res.status(403).send("Accès interdit");
+    }
+
+    // Supprimer toutes les sessions de Redis
+    client.keys("sess:*", (err, keys) => {
+        if (err) {
+            logger.error(err);
+            return res.status(500).send("Erreur serveur");
+        }
+        
+        // Si aucune clé n'est trouvée, simplement retourner
+        if (!keys || keys.length === 0) {
+            return res.send("Aucune session à effacer");
+        }
+
+        // Sinon, supprimer chaque session
+        keys.forEach(key => {
+            client.del(key, (err, response) => {
+                if (err) {
+                    logger.error(err);
+                }
+            });
+        });
+
+        // Envoyer une réponse confirmant la suppression
+        res.send("Toutes les sessions ont été supprimées");
+    });
+});
+
+
 // ======== Démarrage du serveur ========
 app.listen(443, () => logger.info('App is listening on port 443'));
