@@ -114,6 +114,7 @@ passport.use(new GitHubStrategy({
  // Initialise l'id de la prochaine erreur
  let nextErrorId = 1;  
  
+// ======== Configuration des Route ========
  // Route GET pour la page d'accueil
  app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
@@ -229,11 +230,12 @@ app.post('/delete-error', async (req, res) => {
     const index = errors.findIndex(error => Number(error.id) == id); // Trouve l'erreur par son id
 
     // Si l'erreur est trouvée, supprime l'erreur de la liste
+    
     if (index !== -1) {
         errors.splice(index, 1);
     }
-
     // Log la suppression de l'erreur
+
     logger.info(`User: ${req.user.username}, Deleting error: ${JSON.stringify(req.body)}`);
 
     // Met à jour les erreurs sur GitHub
@@ -252,26 +254,8 @@ app.post('/delete-error', async (req, res) => {
     res.redirect('/');
 });
 
-// app.get('/filter/:category', async (req, res) => {
-   // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
-//   if (!req.user) {
-//       return res.redirect('/auth/github');
-//   }
-
-//   const category = req.params.category;
- //  const filteredErrors = errors.filter(error => error.category === category);
-
-   // Log pour le filtrage des erreurs
-//   logger.info(`User: ${req.user.username}, Filtering errors by category: ${category}`);
-
-//   res.render('errors', { errors: filteredErrors });
-//});
-
 app.get('/filter', async (req, res) => {
-   // Assumons que vous avez un tableau d'erreurs nommé 'errors'
    const category = req.query.category;
-
-   // Si aucun paramètre de catégorie n'est fourni, renvoyer toutes les erreurs
    if (!category) {
        res.render('index', { 
            errors: errors, 
@@ -288,15 +272,6 @@ app.get('/filter', async (req, res) => {
        errors: filteredErrors, 
        nextErrorId: Math.max(...errors.map(error => error.id)) + 1,
        totalPages: totalPages
-   });
-});
-
-app.get('/all-categories', (req, res) => {
-   Category.find({}, (err, categories) => { // Pas de filtres appliqués
-       if (err) {
-           return res.status(500).send(err);
-       }
-       res.json(categories);
    });
 });
 
