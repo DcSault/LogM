@@ -143,6 +143,13 @@ passport.use(new GitHubStrategy({
     }
 });
 
+app.use((err, req, res, next) => {
+    console.error(err.message);
+    if (!res.headersSent) {
+        res.status(403).send(err.message); 
+    }
+});
+
 app.get('/', async (req, res) => {
     // Si l'utilisateur n'est pas authentifié, rediriger vers l'authentification GitHub
     if (!req.user) {
