@@ -7,7 +7,7 @@ Un outil simple pour enregistrer et gérer les erreurs. Suivez facilement les d�
 - 🛡️ **Authentification via GitHub**.
 - 📝 **Ajout, édition et suppression d'erreurs**.
 - 🔍 **Filtrage des erreurs par catégorie**.
-- ⚡️ **Stockage rapide et fiable** des données avec Redis et GitHub.
+- ⚡️ **Stockage rapide et fiable** des données avec Redis ou GitHub.
 - 📊 **Pagination** pour la gestion d'un grand nombre d'erreurs.
 
 ## 📂 Structure du projet
