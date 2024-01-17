@@ -322,6 +322,30 @@ app.get('/clear', async (req, res) => {
     });
 });
 
+// Mot de passe défini en dur dans le code
+const ADMIN_PASSWORD = 'MotDePasse';  
+
+app.post('/add-user', async (req, res) => {
+    const submittedPassword = req.body.password;
+    
+    // Vérifiez si le mot de passe fourni correspond au mot de passe administratif
+    if (submittedPassword !== ADMIN_PASSWORD) {
+        return res.status(403).send('Accès interdit');
+    }
+
+    const newUser = req.body.username;
+    if (!newUser) {
+        return res.status(400).send('Nom d\'utilisateur requis');
+    }
+
+    try {
+        await client.sadd('allowedUsers', newUser);
+        res.send(`Utilisateur ${newUser} ajouté avec succès`);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Erreur interne du serveur');
+    }
+});
 
 // ======== Démarrage du serveur ========
 app.listen(443, () => logger.info('App is listening on port 443'));
