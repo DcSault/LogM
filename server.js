@@ -322,6 +322,12 @@ app.get('/clear', async (req, res) => {
     });
 });
 
+// Ajouter cette route GET pour servir la page d'ajout d'utilisateur
+app.get('/add-user', (req, res) => {
+    // Vous pouvez ajouter une logique de vérification ici si nécessaire
+    res.render('add-user');
+});
+
 // Mot de passe défini en dur dans le code
 const ADMIN_PASSWORD = 'MotDePasse';  
 
