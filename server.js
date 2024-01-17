@@ -330,17 +330,25 @@ app.post('/add-user', async (req, res) => {
     
     // Vérifiez si le mot de passe fourni correspond au mot de passe administratif
     if (submittedPassword !== ADMIN_PASSWORD) {
+        logger.warn('Tentative de connexion avec un mot de passe admin incorrect');
         return res.status(403).send('Accès interdit');
     }
 
     const newUser = req.body.username;
     if (!newUser) {
+        logger.warn('Tentative d\'ajout d\'un utilisateur sans nom d\'utilisateur');
         return res.status(400).send('Nom d\'utilisateur requis');
     }
 
     try {
-        await client.sadd('allowedUsers', newUser);
-        res.send(`Utilisateur ${newUser} ajouté avec succès`);
+        const userAdded = await client.sadd('allowedUsers', newUser);
+        if (userAdded) {
+            logger.info(`Utilisateur ${newUser} ajouté avec succès`);
+            res.send(`Utilisateur ${newUser} ajouté avec succès`);
+        } else {
+            logger.warn(`L'utilisateur ${newUser} existe déjà dans la liste des utilisateurs autorisés`);
+            res.send(`L'utilisateur ${newUser} existe déjà`);
+        }
     } catch (err) {
         logger.error(err);
         res.status(500).send('Erreur interne du serveur');
